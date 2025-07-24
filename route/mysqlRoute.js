@@ -1,5 +1,5 @@
 import express from 'express';
-import * as mysqlController from '../controllers/mysqlController.js';
+import * as mysqlController from '../controller/mysqlController.js';
 
 const router = express.Router();
 router.get('/init', mysqlController.initDatabase);

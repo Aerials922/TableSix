@@ -1,4 +1,4 @@
-import connection from "../config/mysql";
+import connection from "../config/mysql.js";
 
 // Initialize the database and create tables if they do not exist
 const initializeDatabase = async () => {
