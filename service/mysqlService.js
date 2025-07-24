@@ -82,3 +82,4 @@ const createTables = async () => {
         console.error("Error creating tables:", error);
     }
 }
+export {initializeDatabase, createTables};
