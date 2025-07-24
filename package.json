@@ -4,7 +4,7 @@
   "main": "API.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node API.js"
+    "start": "node app.js"
   },
   "keywords": [],
   "author": "",
