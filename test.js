@@ -2,10 +2,10 @@ import connection from "../config/mysql.js";
 import * as financialService from '../service/financialSercive.js';
 import axios from 'axios';
 
-let src = "https://c4rm9elh30.execute-api.us-east-1.amazonaws.com/default/cachedPriceData?ticker=";
+let src = "https://c4rm9elh30.execute-api.us-east-1.amazonaws.com/default/cachedPriceData?ticker=TSLA";
 // getFinancialData function to fetch financial data
 export const getFinancialData = async (ticker) => {
-    src = src + ticker;
+    
     // 用于存储所有 volume 的数组
     let volumes = [];
     try {
@@ -24,8 +24,6 @@ export const getFinancialData = async (ticker) => {
 
 export const saveFinancialData = async (ticker, financialData) => {
     try {
-        // 示例：将 ticker 转为小写
-        let low_ticker = ticker.toLowerCase();
         // Assuming financialData is already fetched
         let priceData = financialData.price_data || {};
         let volumes = Array.isArray(priceData.volume) ? priceData.volume : [];
@@ -38,7 +36,7 @@ export const saveFinancialData = async (ticker, financialData) => {
         // Save each piece of data into the database
         for (let i = 0; i < volumes.length; i++) {
             await connection.query(`
-                INSERT INTO ${low_ticker}_pricedata (volume, open, close, high, low, timestamp)
+                INSERT INTO ${ticker}_pricedata (volume, open, close, high, low, timestamp)
                 VALUES (?, ?, ?, ?, ?, ?)
             `, [volumes[i], opens[i], closes[i], highs[i], lows[i], timestamps[i]]);
         }
@@ -47,3 +45,4 @@ export const saveFinancialData = async (ticker, financialData) => {
         console.error(`Error saving financial data for ${ticker}:`, error);
     }
 }
+getFinancialData('TSLA'); // Example call to fetch and save financial data for TSLA 
