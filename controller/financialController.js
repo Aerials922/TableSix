@@ -34,3 +34,12 @@ export const updateFinancialData = async (req, res) => {
         res.status(500).json({ message: 'Error updating financial data.', error: error.message });
     }
 }
+// Controller function to get external financial data
+export const getExternalFinancialData = async (req, res) => {
+    try {
+        const externalFinancialData = await financialService.getExternalFinancialData(req.query.ticker);
+        res.status(200).json({ message: 'External financial data retrieved successfully.', data: externalFinancialData });
+    } catch (error) {
+        res.status(500).json({ message: 'Error retrieving external financial data.', error: error.message });
+    }
+}
