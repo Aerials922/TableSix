@@ -1,0 +1,28 @@
+.display_1x4 {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin: 20px 0;
+}
+.funder_photo {
+    width:120px; 
+    height:120px;
+    border-radius:50%; 
+    object-fit:cover;
+}
+.funder_name {
+    margin-top: 10px;
+    font-weight: bold;
+    text-align: center;
+}
+.container {
+    margin-bottom: 10px;
+}
+#slogan {
+    color: aliceblue;
+}
+.company_stock {
+    margin-top: 10px;
+    font-weight: bold;
+    text-align: center;
+}
