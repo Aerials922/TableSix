@@ -1,6 +1,7 @@
 import connection from "../config/mysql.js";
 import * as financialService from '../service/financialSercive.js';
 import axios from 'axios';
+import * as mysqlService from '../service/mysqlService.js';
 
 let src = "https://c4rm9elh30.execute-api.us-east-1.amazonaws.com/default/cachedPriceData?ticker=";
 // getFinancialData function to fetch financial data
@@ -45,5 +46,28 @@ export const saveFinancialData = async (ticker, financialData) => {
         console.log(`${ticker} financial data saved successfully.`);
     } catch (error) {
         console.error(`Error saving financial data for ${ticker}:`, error);
+    }
+}
+
+export const deleteFinancialData = async (ticker) => {
+    try {
+        // 将 ticker 转为小写
+        let low_ticker = ticker.toLowerCase();
+        await connection.query(`
+            DROP TABLE ${low_ticker}_pricedata
+        `);
+        console.log(`${low_ticker} financial data deleted successfully.`);
+    } catch (error) {
+        console.error(`Error deleting financial data for ${low_ticker}:`, error);
+    }
+}
+export const updateFinancialData = async (ticker) => {
+    try {
+        deleteFinancialData(ticker);
+        mysqlService.createTables();
+        getFinancialData(ticker);
+        console.log(`${ticker} financial data updated successfully.`);
+    } catch (error) {
+        console.error(`Error updating financial data for ${ticker}:`, error);
     }
 }
