@@ -1,7 +1,7 @@
 import * as mysqlService from '../service/mysqlService.js';
 export const initDatabase = async (req, res) => {
     try {
-        const result = await mysqlService.createTables();
+        const result = await mysqlService.initializeDatabase();
         res.status(200).json({ message: 'Database initialized successfully.', result });
     } catch (error) {
         
