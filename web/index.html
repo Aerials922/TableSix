@@ -24,19 +24,19 @@
 
                 <div class="display_1x4">
                     <div>
-                        <img class="funder_photo" src="./img/JASON.webp">
+                        <img class="funder_photo" src="../img/JASON.webp">
                         <div class="funder_name">JASON XU</div>
                     </div>
                     <div>
-                        <img class="funder_photo" src="./img/EKKO.jpg">
+                        <img class="funder_photo" src="../img/EKKO.jpg">
                         <div class="funder_name">EKKO ZHONG</div>
                     </div>
                     <div>
-                        <img class="funder_photo" src="./img/JOLSON.webp">
+                        <img class="funder_photo" src="../img/JOLSON.webp">
                         <div class="funder_name">JOLSON YANG</div>
                     </div>
                     <div>
-                        <img class="funder_photo" src="./img/JOEY.webp">
+                        <img class="funder_photo" src="../img/JOEY.webp">
                         <div class="funder_name">JOEY ZHAO</div>
                     </div>
                 </div>
@@ -58,6 +58,25 @@
                 </div>
             </div>
         </div>
+
+        <div class="container">
+            <table id="stock-table" class="table is-striped is-fullwidth">
+                <thead>
+                    <tr>
+                        <th>Open</th>
+                        <th>Close</th>
+                        <th>High</th>
+                        <th>Low</th>
+                        <th>Volume</th>
+                        <th>Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- 动态插入数据 -->
+                </tbody>
+            </table>
+        </div>
     </section>
-    <script src="app.js"></script>
+    <script type="module" src="./doc.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </body>

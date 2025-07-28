@@ -7,6 +7,7 @@ let src = "https://c4rm9elh30.execute-api.us-east-1.amazonaws.com/default/cached
 // getFinancialData function to fetch financial data
 export const getFinancialData = async (ticker) => {
     src = src + ticker;
+    console.log(`Fetching financial data from: ${src}`);
     // 用于存储所有 volume 的数组
     let volumes = [];
     try {
