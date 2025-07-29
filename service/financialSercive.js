@@ -4,30 +4,30 @@ import axios from 'axios';
 import * as mysqlService from '../service/mysqlService.js';
 
 // original api
-let src = "https://c4rm9elh30.execute-api.us-east-1.amazonaws.com/default/cachedPriceData?ticker=";
+// let src = "https://c4rm9elh30.execute-api.us-east-1.amazonaws.com/default/cachedPriceData?ticker=";
 // external api
 const OUTPUT_SIZE = 'compact'; // 可选值：compact 或 full
 const API_KEY = 'NDUWW8NOMS7G2JCB';
 const INTERVAL = '30min';   // 1min 5min 15min 30min 60min
 
 // getFinancialData function to fetch financial data
-export const getFinancialData = async (ticker) => {
-    const url = src + ticker
-    // 用于存储所有 volume 的数组
-    let volumes = [];
-    try {
-        // Fetch financial data from the service
-        const financialResponse = await axios.get(url);
+// export const getFinancialData = async (ticker) => {
+//     const url = src + ticker
+//     // 用于存储所有 volume 的数组
+//     let volumes = [];
+//     try {
+//         // Fetch financial data from the service
+//         const financialResponse = await axios.get(url);
 
-        let financialData = financialResponse.data;
+//         let financialData = financialResponse.data;
 
-        saveFinancialData(ticker, financialData);
-        return financialData;
+//         saveFinancialData(ticker, financialData);
+//         return financialData;
 
-    } catch (error) {
-        throw new Error('Error fetching financial data: ' + error.message);
-    }
-}
+//     } catch (error) {
+//         throw new Error('Error fetching financial data: ' + error.message);
+//     }
+// }
 
 // 获取外部API的金融数据
 export const getExternalFinancialData = async (ticker) => {
@@ -36,45 +36,6 @@ export const getExternalFinancialData = async (ticker) => {
         const externalfinancialResponse = await axios.get(external_url);
         const externalfinancialData = externalfinancialResponse.data[`Time Series (${INTERVAL})`];
         if (!externalfinancialData) throw new Error('No data returned from external API');
-        // 保存外部API数据到数据库
-        saveExternalFinancialData(ticker, externalfinancialData);
-        return externalfinancialData;
-    } catch (error) {
-        throw new Error('Error fetching external financial data: ' + error.message);
-    }
-}
-
-export const saveFinancialData = async (ticker, financialData) => {
-    try {
-        // 将 ticker 转为小写
-        let low_ticker = ticker.toLowerCase();
-        // Assuming financialData is already fetched
-        let priceData = financialData.price_data || {};
-        let volumes = Array.isArray(priceData.volume) ? priceData.volume : [];
-        let highs = Array.isArray(priceData.high) ? priceData.high : [];
-        let lows = Array.isArray(priceData.low) ? priceData.low : [];
-        let opens = Array.isArray(priceData.open) ? priceData.open : [];
-        let closes = Array.isArray(priceData.close) ? priceData.close : [];
-        let timestamps = Array.isArray(priceData.timestamp) ? priceData.timestamp : [];
-
-        // Save each piece of data into the database
-        for (let i = 0; i < volumes.length; i++) {
-            await connection.query(`
-                INSERT INTO ${low_ticker}_pricedata (volume, open, close, high, low, timestamp)
-                VALUES (?, ?, ?, ?, ?, ?)
-            `, [volumes[i], opens[i], closes[i], highs[i], lows[i], timestamps[i]]);
-        }
-        console.log(`${ticker} financial data saved successfully.`);
-    } catch (error) {
-        console.error(`Error saving financial data for ${ticker}:`, error);
-    }
-}
-
-// 保存外部API金融数据
-export const saveExternalFinancialData = async (ticker, financialData) => {
-    try {
-        // 示例：将 ticker 转为小写
-        let low_ticker = ticker.toLowerCase();
         // 分别存储各项数据
         const timestamps = [];
         const opens = [];
@@ -82,13 +43,13 @@ export const saveExternalFinancialData = async (ticker, financialData) => {
         const lows = [];
         const closes = [];
         const volumes = [];
-        for (const time in financialData) {
+        for (const time in externalfinancialData) {
             timestamps.push(time);
-            opens.push(Number(financialData[time]["1. open"]));
-            highs.push(Number(financialData[time]["2. high"]));
-            lows.push(Number(financialData[time]["3. low"]));
-            closes.push(Number(financialData[time]["4. close"]));
-            volumes.push(Number(financialData[time]["5. volume"]));
+            opens.push(Number(externalfinancialData[time]["1. open"]));
+            highs.push(Number(externalfinancialData[time]["2. high"]));
+            lows.push(Number(externalfinancialData[time]["3. low"]));
+            closes.push(Number(externalfinancialData[time]["4. close"]));
+            volumes.push(Number(externalfinancialData[time]["5. volume"]));
         }
         // 按时间升序排列
         const sorted = timestamps.map((t, i) => ({
@@ -106,6 +67,56 @@ export const saveExternalFinancialData = async (ticker, financialData) => {
         const sortedLows = sorted.map(d => d.low);
         const sortedCloses = sorted.map(d => d.close);
         const sortedVolumes = sorted.map(d => d.volume);
+        // 保存外部API数据到数据库
+        saveExternalFinancialData(ticker, sortedVolumes, sortedOpens, sortedCloses, sortedHighs, sortedLows, sortedTimestamps);
+        // 将各种数据放在一个元组返回
+        let DataGroup = {
+            timestamps: sortedTimestamps,
+            opens: sortedOpens,
+            highs: sortedHighs,
+            lows: sortedLows,
+            closes: sortedCloses,
+            volumes: sortedVolumes
+        };
+        return DataGroup;
+    } catch (error) {
+        throw new Error('Error fetching external financial data: ' + error.message);
+    }
+}
+
+// export const saveFinancialData = async (ticker, financialData) => {
+//     try {
+//         // 将 ticker 转为小写
+//         let low_ticker = ticker.toLowerCase();
+//         // Assuming financialData is already fetched
+//         let priceData = financialData.price_data || {};
+//         let volumes = Array.isArray(priceData.volume) ? priceData.volume : [];
+//         let highs = Array.isArray(priceData.high) ? priceData.high : [];
+//         let lows = Array.isArray(priceData.low) ? priceData.low : [];
+//         let opens = Array.isArray(priceData.open) ? priceData.open : [];
+//         let closes = Array.isArray(priceData.close) ? priceData.close : [];
+//         let timestamps = Array.isArray(priceData.timestamp) ? priceData.timestamp : [];
+
+//         // Save each piece of data into the database
+//         for (let i = 0; i < volumes.length; i++) {
+//             await connection.query(`
+//                 INSERT INTO ${low_ticker}_pricedata (volume, open, close, high, low, timestamp)
+//                 VALUES (?, ?, ?, ?, ?, ?)
+//             `, [volumes[i], opens[i], closes[i], highs[i], lows[i], timestamps[i]]);
+//         }
+//         console.log(`${ticker} financial data saved successfully.`);
+//     } catch (error) {
+//         console.error(`Error saving financial data for ${ticker}:`, error);
+//     }
+// }
+
+
+
+// 保存外部API金融数据
+export const saveExternalFinancialData = async (ticker, volumes, opens, closes, highs, lows, timestamps) => {
+    try {
+        // 将 ticker 转为小写
+        let low_ticker = ticker.toLowerCase();
         // 如果数据表不存在则创建
         await connection.query(`
             CREATE TABLE IF NOT EXISTS ${low_ticker}_pricedata (
@@ -119,11 +130,11 @@ export const saveExternalFinancialData = async (ticker, financialData) => {
             )
         `);
         // 保存数据到数据库
-        for (let i = 0; i < sortedVolumes.length; i++) {
+        for (let i = 0; i < volumes.length; i++) {
             await connection.query(`
                 INSERT INTO ${low_ticker}_pricedata (volume, open, close, high, low, timestamp)
                 VALUES (?, ?, ?, ?, ?, ?)
-            `, [sortedVolumes[i], sortedOpens[i], sortedCloses[i], sortedHighs[i], sortedLows[i], sortedTimestamps[i]]);
+            `, [volumes[i], opens[i], closes[i], highs[i], lows[i], timestamps[i]]);
         }
         console.log(`${ticker} financial data saved successfully.`);
     } catch (error) {
