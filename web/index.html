@@ -36,25 +36,9 @@
                         <div class="funder_name">JOLSON YANG</div>
                     </div>
                     <div>
-                        <img class="funder_photo" src="../img/JOEY.webp">
+                        <img class="funder_photo" src="../img/Joey.jpg">
                         <div class="funder_name">JOEY ZHAO</div>
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="container">
-            <div class="box">
-                <div class="hero is-primary">
-                    <div class="hero-body has-text-centered">
-                        <h1 class="title is-2">Stock INFO.</h1>
-                    </div>
-                </div>
-                <div class="display_1x4">
-                    <button class="button is-primary">TSLA</button>
-                    <button class="button is-primary">C</button>
-                    <button class="button is-primary">FB</button>
-                    <button class="button is-primary">AAPL</button>
                 </div>
             </div>
         </div>
@@ -73,25 +57,35 @@
                     </div>
                     <div id="suggestions" class="box"
                         style="display:none; position:absolute; z-index:100; width:90%; margin-left:5%;"></div>
-                    <p class="panel-tabs">
-                        <a class="is-active">Stock Selector</a>
-                    </p>
                     <div id="repoList"></div>
                     <div class="panel-block">
-                        <button class="button is-link is-outlined is-fullwidth">
-                            Submit
-                        </button>
+                        <div style="width:100%; display:flex; justify-content:center;">
+                            <button class="button is-primary">
+                                Submit
+                            </button>
+                        </div>
                     </div>
                 </nav>
-                <script src="doc.js"></script>
             </div>
         </div>
 
         <div class="container">
             <div class="box">
+                <div class="hero is-primary">
+                    <div class="hero-body has-text-centered">
+                        <h1 class="title is-2">World Stock INFO.</h1>
+                    </div>
+                </div>
+                <div class="display_1x4">
+                    <button class="button is-primary">TSLA</button>
+                    <button class="button is-primary">C</button>
+                    <button class="button is-primary">FB</button>
+                    <button class="button is-primary">AAPL</button>
+                </div>
                 <canvas id="stock-chart"></canvas>
             </div>
         </div>
+
 
         <div class="container">
             <table id="stock-table" class="table is-striped is-fullwidth">

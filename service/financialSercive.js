@@ -1,5 +1,4 @@
 import connection from "../config/mysql.js";
-import * as financialService from '../service/financialSercive.js';
 import axios from 'axios';
 import * as mysqlService from '../service/mysqlService.js';
 
