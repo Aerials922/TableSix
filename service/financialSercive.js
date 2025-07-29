@@ -6,13 +6,12 @@ import * as mysqlService from '../service/mysqlService.js';
 let src = "https://c4rm9elh30.execute-api.us-east-1.amazonaws.com/default/cachedPriceData?ticker=";
 // getFinancialData function to fetch financial data
 export const getFinancialData = async (ticker) => {
-    src = src + ticker;
-    console.log(`Fetching financial data from: ${src}`);
+    const url = src + ticker
     // 用于存储所有 volume 的数组
     let volumes = [];
     try {
         // Fetch financial data from the service
-        const financialResponse = await axios.get(src);
+        const financialResponse = await axios.get(url);
 
         let financialData = financialResponse.data;
 
