@@ -24,6 +24,16 @@ export const getExternalFinancialData = async (req, res) => {
 //     }
 // }
 
+// 从数据库获取金融数据
+export const getExternalFinancialDataFromDB = async (req, res) => {
+    try {
+        const externalFinancialData = await financialService.getExternalFinancialDataFromDB(req.query.ticker);
+        res.status(200).json({ message: 'External financial data retrieved successfully.', data: externalFinancialData });
+    } catch (error) {
+        res.status(500).json({ message: 'Error retrieving external financial data from DB.', error: error.message });
+    }
+}
+
 // Controller function to delete financial data table
 export const deleteFinancialData = async (req, res) => {
     try {

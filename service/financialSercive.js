@@ -141,6 +141,45 @@ export const saveExternalFinancialData = async (ticker, volumes, opens, closes, 
     }
 }
 
+// 从数据库获取金融数据
+export const getExternalFinancialDataFromDB = async (ticker) => {
+    try {
+        let low_ticker = ticker.toLowerCase();
+        const [rows] = await connection.query(
+            `SELECT volume, open, close, high, low, timestamp FROM ${low_ticker}_pricedata ORDER BY timestamp ASC`
+        );
+        // 分别提取各项数据
+        let timestamps = [];
+        let opens = [];
+        let highs = [];
+        let lows = [];
+        let closes = [];
+        let volumes = [];
+        for (const row of rows) {
+            timestamps.push(row.timestamp);
+            opens.push(Number(row.open));
+            highs.push(Number(row.high));
+            lows.push(Number(row.low));
+            closes.push(Number(row.close));
+            volumes.push(Number(row.volume));
+        }
+        // 将各种数据放在一个元组返回
+        let DataGroup = {
+            timestamps: timestamps,
+            opens: opens,
+            highs: highs,
+            lows: lows,
+            closes: closes,
+            volumes: volumes
+        };
+        console.log(`${ticker} financial data retrieved successfully from DB.`);
+        return DataGroup;
+    } catch (error) {
+        console.error(`Error fetching external financial data from DB for ${ticker}:`, error);
+        return { timestamps: [], opens: [], highs: [], lows: [], closes: [], volumes: [] };
+    }
+}
+
 // 删除金融数据
 export const deleteFinancialData = async (ticker) => {
     try {
