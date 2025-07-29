@@ -38,7 +38,7 @@ function displayFinancialData(ticker) {
             // });
 
             const chart_data = {
-                labels: labdata.timestamp,
+                labels: data.timestamp,
                 datasets: [
                     {
                         label: 'open',
