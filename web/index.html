@@ -61,6 +61,34 @@
 
         <div class="container">
             <div class="box">
+                <nav class="panel">
+                    <p class="panel-heading">Stock Repositories</p>
+                    <div class="panel-block">
+                        <p class="control has-icons-left" style="width:100%;">
+                            <input class="input" type="text" id="searchInput" placeholder="Search" autocomplete="off" />
+                            <span class="icon is-left">
+                                <i class="fas fa-search" aria-hidden="true"></i>
+                            </span>
+                        </p>
+                    </div>
+                    <div id="suggestions" class="box"
+                        style="display:none; position:absolute; z-index:100; width:90%; margin-left:5%;"></div>
+                    <p class="panel-tabs">
+                        <a class="is-active">Stock Selector</a>
+                    </p>
+                    <div id="repoList"></div>
+                    <div class="panel-block">
+                        <button class="button is-link is-outlined is-fullwidth">
+                            Submit
+                        </button>
+                    </div>
+                </nav>
+                <script src="doc.js"></script>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="box">
                 <canvas id="stock-chart"></canvas>
             </div>
         </div>

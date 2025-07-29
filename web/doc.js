@@ -121,3 +121,76 @@ function displayFinancialData(ticker) {
             console.error(err);
         });
 }
+
+
+
+// Single shared repos array for all logic
+let repos = [];
+const input = document.getElementById('searchInput');
+const suggestions = document.getElementById('suggestions');
+
+fetch('../us-stock-code-zh.json')
+    .then(response => response.json())
+    .then(data => {
+        repos = Object.keys(data);
+        renderRepoList();
+    })
+    .catch(error => {
+        console.error('Error loading JSON:', error);
+    });
+
+function renderRepoList() {
+    const repoList = document.getElementById('repoList');
+    // Show only first 10 items, but allow scrolling for the rest
+    repoList.style.maxHeight = "200px"; // Adjust height as needed
+    repoList.style.overflowY = "auto";
+    repoList.innerHTML = repos.slice(0, 5).map(r => `
+                <a class="panel-block">
+                    <span class="panel-icon">
+                        <i class="fas fa-book" aria-hidden="true"></i>
+                    </span>
+                    ${r}
+                </a>
+            `).join('');
+    // Add the rest of the items
+    if (repos.length > 10) {
+        repoList.innerHTML += repos.slice(10).map(r => `
+                    <a class="panel-block">
+                        <span class="panel-icon">
+                            <i class="fas fa-book" aria-hidden="true"></i>
+                        </span>
+                        ${r}
+                    </a>
+                `).join('');
+    }
+}
+
+input.addEventListener('input', function () {
+    const value = this.value.trim().toLowerCase();
+    if (value === "") {
+        suggestions.style.display = "none";
+        suggestions.innerHTML = "";
+        return;
+    }
+    const filtered = repos.filter(r => r.toLowerCase().includes(value));
+    if (filtered.length === 0) {
+        suggestions.style.display = "none";
+        suggestions.innerHTML = "";
+        return;
+    }
+    suggestions.innerHTML = filtered.map(r => `<div class="panel-block" style="cursor:pointer;">${r}</div>`).join('');
+    suggestions.style.display = "block";
+});
+
+suggestions.addEventListener('click', function (e) {
+    if (e.target.classList.contains('panel-block')) {
+        input.value = e.target.textContent;
+        suggestions.style.display = "none";
+    }
+});
+
+document.addEventListener('click', function (e) {
+    if (!input.contains(e.target) && !suggestions.contains(e.target)) {
+        suggestions.style.display = "none";
+    }
+});
