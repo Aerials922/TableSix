@@ -69,17 +69,18 @@
     npm install
     ```
 3.  配置环境变量:
-    * 创建一个 `.env` 文件。
+    * 在`config/mysql.js`文件内进行配置。
     * 在文件中添加必要的环境变量，如数据库连接字符串和Alpha Vantage API密钥。
     ```
     # MySQL 连接信息
-    DB_HOST="[您的首尔服务器IP]"
-    DB_USER="[数据库用户名]"
-    DB_PASSWORD="[数据库密码]"
-    DB_NAME="[数据库名称]"
-    
-    # API 密钥
-    ALPHA_VANTAGE_API_KEY="[您的Alpha Vantage API密钥]"
+    import mysql from 'mysql2/promise';
+    const connection = mysql.createPool({
+        host: 'IP',
+        user: 'username',
+        password: 'passwd',
+        database: 'table_six',
+    });
+    export default connection;
     ```
 4.  启动后端服务:
     ```bash
