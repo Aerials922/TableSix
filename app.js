@@ -2,13 +2,15 @@ import express from 'express';
 import cors from 'cors';
 import mysqlRoute from './route/mysqlRoute.js';
 import financialRoute from './route/financialRoute.js';
+import loginRoute from './route/loginRoute.js';
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use('/mysql', mysqlRoute);
-app.use('/financial', financialRoute);
+app.use('/tab_six/mysql', mysqlRoute);
+app.use('/tab_six/stock', financialRoute);
+app.use('/tab_six/', loginRoute);
 
 const PORT = 3000;
 app.listen(PORT, () => {
