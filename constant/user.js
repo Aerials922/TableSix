@@ -22,7 +22,7 @@ class user {
     set cash(cash) {
         this._cash = cash;
     }
-     toJSON() {
+    toJSON() {
         return {
             username: this._username,
             password: this._password,

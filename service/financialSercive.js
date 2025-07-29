@@ -6,7 +6,7 @@ import * as mysqlService from '../service/mysqlService.js';
 // let src = "https://c4rm9elh30.execute-api.us-east-1.amazonaws.com/default/cachedPriceData?ticker=";
 // external api
 const OUTPUT_SIZE = 'compact'; // 可选值：compact 或 full
-const API_KEY = 'NDUWW8NOMS7G2JCB';
+const API_KEY = 'WREASZ8E0M9JJBEE';
 const INTERVAL = '30min';   // 1min 5min 15min 30min 60min
 
 // getFinancialData function to fetch financial data
