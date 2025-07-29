@@ -20,8 +20,25 @@ function displayFinancialData(ticker) {
             const tableBody = document.querySelector('#stock-table tbody');
             tableBody.innerHTML = ''; // 清空旧数据
 
+            // 优化时间标签显示，只显示月、日、时、分、秒（假设 timestamp 是 ISO 字符串或类似格式）
+            // const labels = data.timestamp.map(ts => {
+            //     if (typeof ts === 'string') {
+            //         // 解析 ISO 格式时间
+            //         const date = new Date(ts);
+            //         if (!isNaN(date.getTime())) {
+            //             const MM = String(date.getMonth() + 1).padStart(2, '0');
+            //             const DD = String(date.getDate()).padStart(2, '0');
+            //             const hh = String(date.getHours()).padStart(2, '0');
+            //             const mm = String(date.getMinutes()).padStart(2, '0');
+            //             const ss = String(date.getSeconds()).padStart(2, '0');
+            //             return `${MM}-${DD} ${hh}:${mm}:${ss}`;
+            //         }
+            //     }
+            //     return ts;
+            // });
+
             const chart_data = {
-                labels: data.timestamp,
+                labels: labdata.timestamp,
                 datasets: [
                     {
                         label: 'open',
@@ -59,7 +76,17 @@ function displayFinancialData(ticker) {
                         }
                     },
                     scales: {
-                        x: { stacked: false }, // 折线图无需堆叠
+                        x: {
+                            stacked: false,
+                            ticks: {
+                                // 每隔 N 个显示一个标签，比如每隔 5 个
+                                callback: function (value, index, ticks) {
+                                    return index % 5 === 0 ? this.getLabelForValue(value) : '';
+                                },
+                                maxRotation: 45, // 标签倾斜角度
+                                minRotation: 45
+                            }
+                        }, // 折线图无需堆叠
                         y: { stacked: false }
                     }
                 }
