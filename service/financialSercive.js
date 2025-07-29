@@ -3,7 +3,13 @@ import * as financialService from '../service/financialSercive.js';
 import axios from 'axios';
 import * as mysqlService from '../service/mysqlService.js';
 
+// original api
 let src = "https://c4rm9elh30.execute-api.us-east-1.amazonaws.com/default/cachedPriceData?ticker=";
+// external api
+const OUTPUT_SIZE = 'compact'; // 可选值：compact 或 full
+const API_KEY = 'NDUWW8NOMS7G2JCB';
+const INTERVAL = '30min';   // 1min 5min 15min 30min 60min
+
 // getFinancialData function to fetch financial data
 export const getFinancialData = async (ticker) => {
     const url = src + ticker
@@ -23,9 +29,24 @@ export const getFinancialData = async (ticker) => {
     }
 }
 
+// 获取外部API的金融数据
+export const getExternalFinancialData = async (ticker) => {
+    try {
+        const external_url = `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=${ticker}&interval=${INTERVAL}&outputsize=${OUTPUT_SIZE}&apikey=${API_KEY}`;
+        const externalfinancialResponse = await axios.get(external_url);
+        const externalfinancialData = externalfinancialResponse.data[`Time Series (${INTERVAL})`];
+        if (!externalfinancialData) throw new Error('No data returned from external API');
+        // 保存外部API数据到数据库
+        saveExternalFinancialData(ticker, externalfinancialData);
+        return externalfinancialData;
+    } catch (error) {
+        throw new Error('Error fetching external financial data: ' + error.message);
+    }
+}
+
 export const saveFinancialData = async (ticker, financialData) => {
     try {
-        // 示例：将 ticker 转为小写
+        // 将 ticker 转为小写
         let low_ticker = ticker.toLowerCase();
         // Assuming financialData is already fetched
         let priceData = financialData.price_data || {};
@@ -49,6 +70,68 @@ export const saveFinancialData = async (ticker, financialData) => {
     }
 }
 
+// 保存外部API金融数据
+export const saveExternalFinancialData = async (ticker, financialData) => {
+    try {
+        // 示例：将 ticker 转为小写
+        let low_ticker = ticker.toLowerCase();
+        // 分别存储各项数据
+        const timestamps = [];
+        const opens = [];
+        const highs = [];
+        const lows = [];
+        const closes = [];
+        const volumes = [];
+        for (const time in financialData) {
+            timestamps.push(time);
+            opens.push(Number(financialData[time]["1. open"]));
+            highs.push(Number(financialData[time]["2. high"]));
+            lows.push(Number(financialData[time]["3. low"]));
+            closes.push(Number(financialData[time]["4. close"]));
+            volumes.push(Number(financialData[time]["5. volume"]));
+        }
+        // 按时间升序排列
+        const sorted = timestamps.map((t, i) => ({
+            timestamp: t,
+            open: opens[i],
+            high: highs[i],
+            low: lows[i],
+            close: closes[i],
+            volume: volumes[i]
+        })).sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+        // 拆分回各数组
+        const sortedTimestamps = sorted.map(d => d.timestamp);
+        const sortedOpens = sorted.map(d => d.open);
+        const sortedHighs = sorted.map(d => d.high);
+        const sortedLows = sorted.map(d => d.low);
+        const sortedCloses = sorted.map(d => d.close);
+        const sortedVolumes = sorted.map(d => d.volume);
+        // 如果数据表不存在则创建
+        await connection.query(`
+            CREATE TABLE IF NOT EXISTS ${low_ticker}_pricedata (
+                id int auto_increment primary key,
+                volume BIGINT,
+                open decimal(20,8) not null,
+                close decimal(20,8) not null,
+                high  decimal(20,8) not null,
+                low  decimal(20,8) not null,
+                timestamp datetime
+            )
+        `);
+        // 保存数据到数据库
+        for (let i = 0; i < sortedVolumes.length; i++) {
+            await connection.query(`
+                INSERT INTO ${low_ticker}_pricedata (volume, open, close, high, low, timestamp)
+                VALUES (?, ?, ?, ?, ?, ?)
+            `, [sortedVolumes[i], sortedOpens[i], sortedCloses[i], sortedHighs[i], sortedLows[i], sortedTimestamps[i]]);
+        }
+        console.log(`${ticker} financial data saved successfully.`);
+    } catch (error) {
+        console.error(`Error saving external financial data for ${ticker}:`, error);
+    }
+}
+
+// 删除金融数据
 export const deleteFinancialData = async (ticker) => {
     try {
         // 将 ticker 转为小写
