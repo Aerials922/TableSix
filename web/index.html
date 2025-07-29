@@ -13,6 +13,7 @@
 
 <body>
     <section class="section">
+        <!-- 眉头 -->
         <div class="container">
             <div class="box">
                 <div class="hero is-primary">
@@ -22,6 +23,7 @@
                     </div>
                 </div>
 
+                <!-- 创始人展示 -->
                 <div class="display_1x4">
                     <div>
                         <img class="funder_photo" src="../img/JASON.webp">
@@ -43,6 +45,7 @@
             </div>
         </div>
 
+        <!-- 股票信息展示 -->
         <div class="container">
             <div class="box">
                 <nav class="panel">
@@ -60,44 +63,27 @@
                     <div id="repoList"></div>
                     <div class="panel-block">
                         <div style="width:100%; display:flex; justify-content:center;">
-                            <button class="button is-primary">
+                            <button class="button is-primary" id="submitButton">
                                 Submit
                             </button>
                         </div>
                     </div>
                 </nav>
+
+                <div class="hero is-primary" id="stock_info"></div>
+                <canvas id="stock-chart"></canvas>
             </div>
         </div>
 
         <div class="container">
-            <div class="box">
-                <div class="hero is-primary">
-                    <div class="hero-body has-text-centered">
-                        <h1 class="title is-2">World Stock INFO.</h1>
-                    </div>
-                </div>
-                <div class="display_1x4">
-                    <button class="button is-primary">TSLA</button>
-                    <button class="button is-primary">C</button>
-                    <button class="button is-primary">FB</button>
-                    <button class="button is-primary">AAPL</button>
-                </div>
-                <canvas id="stock-chart"></canvas>
-            </div>
+                
         </div>
 
 
         <div class="container">
             <table id="stock-table" class="table is-striped is-fullwidth">
                 <thead>
-                    <tr>
-                        <th>Open</th>
-                        <th>Close</th>
-                        <th>High</th>
-                        <th>Low</th>
-                        <th>Volume</th>
-                        <th>Timestamp</th>
-                    </tr>
+                    <!-- 动态插入数据 -->
                 </thead>
                 <tbody>
                     <!-- 动态插入数据 -->

@@ -4,49 +4,70 @@ const INTERVAL = '30min';   // 1min 5min 15min 30min 60min
 
 // 获取所有 class 为 "button is-primary" 的按钮
 const buttons = document.getElementsByClassName("button is-primary");
-const panel_blocks = document.getElementsByClassName("panel-block");
 
 let stockChartInstance = null;
 
-for (let btn of buttons) {
-    btn.addEventListener('click', function () {
-        const ticker = btn.textContent.trim();
-        displayFinancialData(ticker);
-    });
-}
+// for (let btn of buttons) {
+//     btn.addEventListener('click', function () {
+//         const ticker = "";
+//         displayFinancialData(ticker);
+//     });
+// }
 
 function displayFinancialData(ticker) {
-    fetch(`http://localhost:3000/financial/external?ticker=${encodeURIComponent(ticker)}`)
+    fetch(`http://localhost:3000/tab_six/stock/external?ticker=${encodeURIComponent(ticker)}`)
         .then(res => res.json())
         .then(result => {
-            const data = result.data.price_data;
-            console.log(`Received financial data for ticker: ${ticker}`, data);
-            const tableBody = document.querySelector('#stock-table tbody');
-            tableBody.innerHTML = ''; // 清空旧数据
+            const data = result.data;
+            const stockInfo = document.querySelector('#stock_info');
+            const stockTable = document.getElementById('stock-table');
+            const stockChart = document.getElementById('stock-chart');
+
+            // 判断数据有效性
+            if (!data || !data.opens || !data.opens.length) {
+                stockInfo.innerHTML = `
+                    <div class="hero-body has-text-centered">
+                        <h1 class="title is-2" style="color:red;">数据获取失败</h1>
+                    </div>
+                `;
+                stockTable.style.display = 'none';
+                stockChart.style.display = 'none';
+                if (stockChartInstance) {
+                    stockChartInstance.destroy();
+                    stockChartInstance = null;
+                }
+                return;
+            }
+
+            // 数据有效，显示表格和图表
+            stockInfo.innerHTML = `
+                <div class="hero-body has-text-centered">
+                    <h1 class="title is-2">Stock INFO.</h1>
+                </div>
+            `;
+            stockTable.style.display = '';
+            stockChart.style.display = '';
+
+            // 动态生成表头
+            const tableHead = stockTable.querySelector('thead');
+            tableHead.innerHTML = `
+                <tr>
+                    <th>Open</th>
+                    <th>Close</th>
+                    <th>High</th>
+                    <th>Low</th>
+                    <th>Volume</th>
+                    <th>Timestamp</th>
+                </tr>
+            `;
 
             const chart_data = {
                 labels: data.timestamps,
                 datasets: [
-                    {
-                        label: 'open',
-                        data: data.opens,
-                        backgroundColor: 'rgba(54, 162, 235, 0.6)'
-                    },
-                    {
-                        label: 'close',
-                        data: data.closes,
-                        backgroundColor: 'rgba(255, 99, 132, 0.6)'
-                    },
-                    {
-                        label: 'high',
-                        data: data.highs,
-                        backgroundColor: 'rgba(255, 206, 86, 0.6)'
-                    },
-                    {
-                        label: 'low',
-                        data: data.lows,
-                        backgroundColor: 'rgba(75, 192, 192, 0.6)'
-                    }
+                    {label: 'open', data: data.opens, backgroundColor: 'rgba(54, 162, 235, 0.6)'},
+                    {label: 'close', data: data.closes, backgroundColor: 'rgba(255, 99, 132, 0.6)'},
+                    {label: 'high', data: data.highs, backgroundColor: 'rgba(255, 206, 86, 0.6)'},
+                    {label: 'low', data: data.lows, backgroundColor: 'rgba(75, 192, 192, 0.6)'}
                 ]
             };
 
@@ -66,45 +87,53 @@ function displayFinancialData(ticker) {
                         x: {
                             stacked: false,
                             ticks: {
-                                // 每隔 N 个显示一个标签，比如每隔 5 个
                                 callback: function (value, index, ticks) {
                                     return index % 5 === 0 ? this.getLabelForValue(value) : '';
                                 },
-                                maxRotation: 45, // 标签倾斜角度
+                                maxRotation: 45,
                                 minRotation: 45
                             }
-                        }, // 折线图无需堆叠
+                        },
                         y: { stacked: false }
                     }
                 }
             };
 
             if (stockChartInstance) {
-                stockChartInstance.destroy(); // 销毁旧的图表实例
+                stockChartInstance.destroy();
             }
-            stockChartInstance = new Chart(document.getElementById('stock-chart'), config);
+            stockChartInstance = new Chart(stockChart, config);
 
-            if (data && data.opens && data.opens.length) {
-                for (let i = 0; i < data.opens.length; i++) {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${data.opens[i]}</td>
-                        <td>${data.closes[i]}</td>
-                        <td>${data.highs[i]}</td>
-                        <td>${data.lows[i]}</td>
-                        <td>${data.volumes[i]}</td>
-                        <td>${data.timestamps[i]}</td>
-                    `;
-                    tableBody.appendChild(row);
-                }
-            } else {
+            const tableBody = stockTable.querySelector('tbody');
+            tableBody.innerHTML = '';
+            for (let i = 0; i < data.opens.length; i++) {
                 const row = document.createElement('tr');
-                row.innerHTML = `<td colspan="6">No financial data available for ${ticker}</td>`;
+                row.innerHTML = `
+                    <td>${data.opens[i]}</td>
+                    <td>${data.closes[i]}</td>
+                    <td>${data.highs[i]}</td>
+                    <td>${data.lows[i]}</td>
+                    <td>${data.volumes[i]}</td>
+                    <td>${data.timestamps[i]}</td>
+                `;
                 tableBody.appendChild(row);
             }
         })
         .catch(err => {
-            alert('获取数据失败');
+            const stockInfo = document.querySelector('#stock_info');
+            const stockTable = document.getElementById('stock-table');
+            const stockChart = document.getElementById('stock-chart');
+            stockInfo.innerHTML = `
+                <div class="hero-body has-text-centered">
+                    <h1 class="title is-2" style="color:red;">数据获取失败</h1>
+                </div>
+            `;
+            stockTable.style.display = 'none';
+            stockChart.style.display = 'none';
+            if (stockChartInstance) {
+                stockChartInstance.destroy();
+                stockChartInstance = null;
+            }
             console.error(err);
         });
 }
@@ -135,7 +164,7 @@ function renderRepoList() {
     repoList.style.maxHeight = "200px";
     repoList.style.overflowY = "auto";
     repoList.innerHTML = repos.slice(0, 5).map(r => `
-        <a class="panel-block">
+        <a class="panel-block" id="CompanyStockID"> 
             <span class="panel-icon">
                 <i class="fas fa-book" aria-hidden="true"></i>
             </span>
@@ -144,7 +173,7 @@ function renderRepoList() {
     `).join('');
     if (repos.length > 10) {
         repoList.innerHTML += repos.slice(10).map(r => `
-            <a class="panel-block">
+            <a class="panel-block"  id="CompanyStockID">
                 <span class="panel-icon">
                     <i class="fas fa-book" aria-hidden="true"></i>
                 </span>
@@ -154,30 +183,35 @@ function renderRepoList() {
     }
 
     // 绑定点击事件，处理选中状态
-    Array.from(repoList.querySelectorAll('.panel-block')).forEach(item => {
+    Array.from(repoList.querySelectorAll('#CompanyStockID')).forEach(item => {
         item.addEventListener('click', function () {
-            // 移除所有选中样式
-            repoList.querySelectorAll('.panel-block').forEach(el => el.classList.remove('is-active'));
-            // 当前项添加选中样式
+            // 移除所有选中样式和自定义样式
+            repoList.querySelectorAll('#CompanyStockID').forEach(el => {
+                el.classList.remove('is-active');
+                el.style.backgroundColor = '';
+                el.style.color = '';
+            });
+            // 当前项添加选中样式，只能单选
             this.classList.add('is-active');
-            // 记录当前选中的股票代码
-            selectedTicker = this.textContent.trim();
+            this.style.backgroundColor = 'rgb(0, 209, 178)';
+            this.style.color = 'white';
         });
     });
 }
 
 // Summit 按钮点击事件
-const summitBtn = document.querySelector('.panel-block button.button.is-primary');
+const summitBtn = document.querySelector('#submitButton');
 if (summitBtn) {
     summitBtn.addEventListener('click', function () {
         // 查找已激活的 panel-block
-        const activeBlock = document.querySelector('#repoList .panel-block.is-active');
-        if (activeBlock) {
+        const activateStockID = document.querySelector('#repoList .panel-block.is-active');
+        if (activateStockID) {
             // 获取 ticker 内容
-            const ticker = activeBlock.textContent.trim();
+            const ticker = activateStockID.textContent.trim();
+            console.log(`Summit button clicked for ticker: ${ticker}`);
             displayFinancialData(ticker);
         } else {
-            alert('请先选择一个股票代码');
+            alert('请先选择一个股票代码!');
         }
     });
 }
@@ -204,6 +238,29 @@ suggestions.addEventListener('click', function (e) {
         input.value = e.target.textContent;
         suggestions.style.display = "none";
     }
+
+    // 先移除repoList所有选中样式
+    const repoList = document.getElementById('repoList');
+    repoList.querySelectorAll('.panel-block').forEach(el => {
+        el.classList.remove('is-active');
+        el.style.backgroundColor = '';
+        el.style.color = '';
+    });
+
+    // 在repoList中找到对应项并高亮
+    const match = Array.from(repoList.querySelectorAll('.panel-block')).find(
+        el => el.textContent.trim() === e.target.textContent.trim()
+    );
+    if (match) {
+        match.classList.add('is-active');
+        match.style.backgroundColor = 'rgb(0, 209, 178)';
+        match.style.color = 'white';
+    }
+
+    // 给当前suggestion项也加高亮
+    e.target.classList.add('is-active');
+    e.target.style.backgroundColor = 'rgb(0, 209, 178)';
+    e.target.style.color = 'white';
 });
 
 document.addEventListener('click', function (e) {

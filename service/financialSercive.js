@@ -6,7 +6,7 @@ import * as mysqlService from '../service/mysqlService.js';
 // let src = "https://c4rm9elh30.execute-api.us-east-1.amazonaws.com/default/cachedPriceData?ticker=";
 // external api
 const OUTPUT_SIZE = 'compact'; // 可选值：compact 或 full
-const API_KEY = 'NDUWW8NOMS7G2JCB';
+const API_KEY = '3BUV2ZL04A7RKUOH';
 const INTERVAL = '30min';   // 1min 5min 15min 30min 60min
 
 // getFinancialData function to fetch financial data
@@ -33,6 +33,7 @@ export const getExternalFinancialData = async (ticker) => {
     try {
         const external_url = `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=${ticker}&interval=${INTERVAL}&outputsize=${OUTPUT_SIZE}&apikey=${API_KEY}`;
         const externalfinancialResponse = await axios.get(external_url);
+        console.log(`Received external financial data for ticker: ${ticker}`, externalfinancialResponse.data);
         const externalfinancialData = externalfinancialResponse.data[`Time Series (${INTERVAL})`];
         if (!externalfinancialData) throw new Error('No data returned from external API');
         // 分别存储各项数据
