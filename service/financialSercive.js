@@ -188,19 +188,19 @@ export const deleteFinancialData = async (ticker) => {
         await connection.query(`
             DROP TABLE ${low_ticker}_pricedata
         `);
-        console.log(`${low_ticker} financial data deleted successfully.`);
+        console.log(`${ticker} financial data deleted successfully.`);
     } catch (error) {
-        console.error(`Error deleting financial data for ${low_ticker}:`, error);
+        console.error(`Error deleting financial data for ${ticker}:`, error);
     }
 }
 
-export const updateFinancialData = async (tickers) => {
-    tickers = user_tickers;
+// 支持传入自定义股票列表
+export const updateFinancialData = async (tickers = user_tickers) => {
     // mysqlService.update();
     for (let i = 0; i < tickers.length; i++) {
         try {
-            deleteFinancialData(tickers[i]);
-            getExternalFinancialData(tickers[i]);
+            await deleteFinancialData(tickers[i]);
+            await getExternalFinancialData(tickers[i]);
             // delay 1s
             await new Promise(resolve => setTimeout(resolve, 1000)); // 1秒延迟
             console.log(`${tickers[i]} financial data updated successfully.`);
