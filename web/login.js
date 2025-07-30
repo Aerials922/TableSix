@@ -1,15 +1,17 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const loginForm = document.getElementById('login-form');
+    const loginForm = document.getElementById('loginForm');
     if (!loginForm) return;
 
     loginForm.addEventListener('submit', async function (e) {
         e.preventDefault();
 
         const username = document.getElementById('username').value.trim();
+        console.log(`Username entered: ${username}`);
         const password = document.getElementById('password').value;
+        console.log(`Password entered: ${password}`);
 
         try {
-            const response = await fetch('/tab_six/login', {
+            const response = await fetch('http://localhost:3000/tab_six/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password })
