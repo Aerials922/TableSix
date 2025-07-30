@@ -6,3 +6,10 @@ asset {
     "Cuurent Value"(单笔当前价格):
     "Gain/Loss"（具体盈亏）:
 }
+
+个人资产概览
+generalAsset{
+    "Total Cost"（投入资产，默认100000）:
+    "Current Value"（当前资产）:
+    "Total Gain/Loss"（总盈亏）:
+}
