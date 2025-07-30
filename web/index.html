@@ -84,6 +84,65 @@
                 </tbody>
             </table>
         </div>
+
+        <!-- 资产管理页面 -->
+        <div class="container">
+            <h1 class="title has-text-centered mb-5">Portfolio Management</h1>
+            <!-- 资产总览 -->
+            <div class="columns is-variable is-4 mb-5">
+                <div class="column">
+                    <div class="box overview-item">
+                        <div class="overview-label">Total Cost</div>
+                        <div class="overview-value" id="total-cost"></div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="box overview-item">
+                        <div class="overview-label">Current Value</div>
+                        <div class="overview-value" id="current-value"></div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="box overview-item">
+                        <div class="overview-label">Total Gain/Loss</div>
+                        <div class="overview-value" id="total-gain"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="columns is-variable is-4">
+                <!-- 资产配置饼图 -->
+                <div class="column is-one-third">
+                    <div class="pie-chart-section box">
+                        <div class="pie-chart-title">Asset Allocation</div>
+                        <canvas id="pieChart" width="200" height="200"></canvas>
+                        <div style="margin-top:16px;">
+                            <span class="legend-dot legend-stock"></span> Stock
+                            <span class="legend-dot legend-cash" style="margin-left:18px;"></span> Cash
+                        </div>
+                    </div>
+                </div>
+                <!-- 资产详细信息列表 -->
+                <div class="column">
+                    <div class="details-section box">
+                        <div class="details-title">Asset Details</div>
+                        <table class="table is-striped is-fullwidth">
+                            <thead>
+                                <tr>
+                                    <th>Asset Type</th>
+                                    <th>Name</th>
+                                    <th>Quantity</th>
+                                    <th>Current Value</th>
+                                    <th>Gain/Loss</th>
+                                </tr>
+                            </thead>
+                            <tbody id="asset-tbody">
+                                <!-- 动态渲染 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </section>
     <script type="module" src="./doc.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
