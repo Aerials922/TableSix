@@ -15,6 +15,16 @@ export const buyingIn = async (username, ticker, amount) => {
             const userId = rows[0].id;
             const queryToBuyingIn = 'INSERT INTO positions (user_id, ticker, amount, price) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE amount = amount + VALUES(amount)';
             const [result] = await connection.query(queryToBuyingIn, [userId, ticker, amount, price]);
+            //检测user表中的现金余额是否足够
+            const queryToCheckCash = 'SELECT cash FROM user WHERE id = ?';
+            const [cashRows] = await connection.query(queryToCheckCash, [userId]);
+            if (cashRows.length === 0 || cashRows[0].cash < amount * price) {
+                console.warn(`User ${username} does not have enough cash to buy in.`);
+                return res.status(400).json({ message: 'Insufficient cash balance.' });
+            }
+            //修改user表中的现金余额
+            const queryToUpdateCash = 'UPDATE user SET cash = cash - ? * ? WHERE id = ?';
+            await connection.query(queryToUpdateCash, [amount, price, userId]);
             return {
                 username,
                 ticker,
@@ -47,11 +57,15 @@ export const buyingOut = async (username, ticker, amount) => {
         if (rows.length != 0) {
             const userId = rows[0].id;
             const queryToBuyingOut = 'UPDATE positions SET amount = amount - ?, price = ?WHERE user_id = ? AND ticker = ?';
+            
             const [result] = await connection.query(queryToBuyingOut, [amount, price, userId, ticker]);
         } else {
             console.warn(`User ${username} not found.`);
             return res.status(404).json({ message: 'User not found.' });
         }
+        //修改user表中的现金余额
+        const queryToUpdateCash = 'UPDATE user SET cash = cash + ? * ? WHERE id = ?';
+        await connection.query(queryToUpdateCash, [amount, price, userId]);
         return {
             username,
             ticker,
