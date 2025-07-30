@@ -6,5 +6,6 @@ const router = express.Router();
 router.put('/update', financialController.updateFinancialData);
 router.delete('/delete', financialController.deleteFinancialData);
 router.get('/getFromDB', financialController.getExternalFinancialDataFromDB);
+router.get('/getLastFromDB', financialController.getLastFinancialData);
 router.get('/external', financialController.getExternalFinancialData);
 export default router;
