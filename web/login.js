@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 window.location.href = 'index.html';
             } else {
                 const result = await response.json();
-                alert(result.message || '登录失败，请重试');
+                alert('登录失败，请重试' || result.message);
             }
         } catch (error) {
             alert('网络错误，请稍后重试');

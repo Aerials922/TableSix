@@ -7,6 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const formData = new FormData(form);
         const data = Object.fromEntries(formData.entries());
+        console.log(`Username entered: ${data.username}`);
+        console.log(`Password entered: ${data.password}`);
 
         try {
             const response = await fetch('http://localhost:3000/tab_six/register', {
@@ -19,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (response.ok) {
                 alert('注册成功！即将跳转到登录页面。');
-                window.location.href = '/login.html';
+                window.location.href = 'login.html';
             } else {
                 alert(result.message || '注册失败，请重试。');
             }
