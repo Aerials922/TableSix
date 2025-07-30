@@ -135,28 +135,27 @@
                                     <th>Gain/Loss</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="asset-tbody">
+                                <!-- 动态渲染 -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- 新增交易记录版块 -->
+                    <div class="details-section box" style="margin-top:24px;">
+                        <div class="details-title">Transaction Records</div>
+                        <table class="table is-striped is-fullwidth">
+                            <thead>
                                 <tr>
-                                    <td>Stock</td>
-                                    <td>招商银行</td>
-                                    <td>500</td>
-                                    <td>¥20,000</td>
-                                    <td class="has-text-success">+¥2,000</td>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Asset</th>
+                                    <th>Quantity</th>
+                                    <th>Price</th>
+                                    <th>Total</th>
                                 </tr>
-                                <tr>
-                                    <td>Stock</td>
-                                    <td>贵州茅台</td>
-                                    <td>100</td>
-                                    <td>¥18,000</td>
-                                    <td class="has-text-success">+¥1,500</td>
-                                </tr>
-                                <tr>
-                                    <td>Cash</td>
-                                    <td>人民币</td>
-                                    <td>--</td>
-                                    <td>¥82,000</td>
-                                    <td>--</td>
-                                </tr>
+                            </thead>
+                            <tbody id="transaction-tbody">
+                                <!-- 动态渲染 -->
                             </tbody>
                         </table>
                     </div>
