@@ -3,7 +3,8 @@ import * as exchangeService from '../service/exchangeService.js';
 export const buyingIn = async (req, res) => {
     try{
         const { username, ticker, amount } = req.body;
-        const result = await exchangeService.buyingIn(username, ticker, amount);
+        let low_ticker = ticker.toLowerCase()
+        const result = await exchangeService.buyingIn(username, low_ticker, amount);
         res.status(200).json({message: 'Buying in successful.', data: result});
     }catch (error) {
         console.error('Error during buying in:', error);
@@ -13,7 +14,8 @@ export const buyingIn = async (req, res) => {
 export const buyingOut = async (req, res) => {
     try{
         const { username, ticker, amount } = req.body;
-        const result = await exchangeService.buyingOut(username, ticker, amount);
+        let low_ticker = ticker.toLowerCase()
+        const result = await exchangeService.buyingOut(username, low_ticker, amount);
         res.status(200).json({message: 'Buying out successful.', data: result});
     }catch (error) {
         console.error('Error during buying out:', error);

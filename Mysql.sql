@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS positions (
     user_id INT NOT NULL,
     ticker VARCHAR(10) NOT NULL,
     amount INT NOT NULL,
+    price DECIMAL(15, 2) NOT NULL,
     CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
     CONSTRAINT unique_user_ticker UNIQUE (user_id, ticker)
 );
