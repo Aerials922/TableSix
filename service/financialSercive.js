@@ -8,7 +8,7 @@ import * as mysqlService from '../service/mysqlService.js';
 const OUTPUT_SIZE = 'compact'; // 可选值：compact 或 full
 const API_KEY = 'NDUWW8NOMS7G2JCB';
 const INTERVAL = '30min';   // 1min 5min 15min 30min 60min
-
+let  user_tickers = ["TSLA", "IBM", "GOOG", "AAPL", "FB"];
 // getFinancialData function to fetch financial data
 // export const getFinancialData = async (ticker) => {
 //     const url = src + ticker
@@ -193,13 +193,17 @@ export const deleteFinancialData = async (ticker) => {
         console.error(`Error deleting financial data for ${low_ticker}:`, error);
     }
 }
-export const updateFinancialData = async (ticker) => {
-    try {
-        deleteFinancialData(ticker);
-        mysqlService.createTables();
-        getFinancialData(ticker);
-        console.log(`${ticker} financial data updated successfully.`);
-    } catch (error) {
-        console.error(`Error updating financial data for ${ticker}:`, error);
+
+export const updateFinancialData = async (tickers) => {
+    tickers = user_tickers;
+    // mysqlService.update();
+    for (let i = 0; i < tickers.length; i++) {
+        try {
+            deleteFinancialData(tickers[i]);
+            getExternalFinancialData(tickers[i]);
+            console.log(`${tickers[i]} financial data updated successfully.`);
+        } catch (error) {
+            console.error(`Error updating financial data for ${tickers[i]}:`, error);
+        }
     }
 }
