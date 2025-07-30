@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Portfolio Management</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bulma CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
+    <link rel="stylesheet" href="./style.css">
+    <style>
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            padding: 32px 40px 40px 40px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 32px;
+            color: #222;
+        }
+        .overview {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 32px;
+        }
+        .overview-item {
+            background: #f0f4fa;
+            border-radius: 8px;
+            padding: 1.5rem 0;
+            text-align: center;
+            margin-bottom: 0;
+        }
+        .overview-label {
+            color: #888;
+            font-size: 15px;
+            margin-bottom: 8px;
+        }
+        .overview-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2d8cf0;
+        }
+        .main-content {
+            display: flex;
+            gap: 32px;
+        }
+        .pie-chart-section {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .pie-chart-title {
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            color: #444;
+        }
+        .details-section {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+        .details-title {
+            font-size: 1.1rem;
+            color: #444;
+            margin-bottom: 1rem;
+        }
+        .legend-dot {
+            display:inline-block;
+            width:12px;
+            height:12px;
+            border-radius:2px;
+            margin-right:6px;
+        }
+        .legend-stock { background:#2d8cf0; }
+        .legend-cash { background:#f5a623; }
+        @media (max-width: 900px) {
+            .columns { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <section class="section">
+        <div class="container">
+            <h1 class="title has-text-centered mb-5">Portfolio Management</h1>
+            <!-- 资产总览 -->
+            <div class="columns is-variable is-4 mb-5">
+                <div class="column">
+                    <div class="box overview-item">
+                        <div class="overview-label">Total Cost</div>
+                        <div class="overview-value" id="total-cost"></div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="box overview-item">
+                        <div class="overview-label">Current Value</div>
+                        <div class="overview-value" id="current-value"></div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="box overview-item">
+                        <div class="overview-label">Total Gain/Loss</div>
+                        <div class="overview-value" id="total-gain"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="columns is-variable is-4">
+                <!-- 资产配置饼图 -->
+                <div class="column is-one-third">
+                    <div class="pie-chart-section box">
+                        <div class="pie-chart-title">Asset Allocation</div>
+                        <canvas id="pieChart" width="200" height="200"></canvas>
+                        <div style="margin-top:16px;">
+                            <span class="legend-dot legend-stock"></span> Stock
+                            <span class="legend-dot legend-cash" style="margin-left:18px;"></span> Cash
+                        </div>
+                    </div>
+                </div>
+                <!-- 资产详细信息列表 -->
+                <div class="column">
+                    <div class="details-section box">
+                        <div class="details-title">Asset Details</div>
+                        <table class="table is-striped is-fullwidth">
+                            <thead>
+                                <tr>
+                                    <th>Asset Type</th>
+                                    <th>Name</th>
+                                    <th>Quantity</th>
+                                    <th>Current Value</th>
+                                    <th>Gain/Loss</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Stock</td>
+                                    <td>招商银行</td>
+                                    <td>500</td>
+                                    <td>¥20,000</td>
+                                    <td class="has-text-success">+¥2,000</td>
+                                </tr>
+                                <tr>
+                                    <td>Stock</td>
+                                    <td>贵州茅台</td>
+                                    <td>100</td>
+                                    <td>¥18,000</td>
+                                    <td class="has-text-success">+¥1,500</td>
+                                </tr>
+                                <tr>
+                                    <td>Cash</td>
+                                    <td>人民币</td>
+                                    <td>--</td>
+                                    <td>¥82,000</td>
+                                    <td>--</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // 饼图数据
+        const data = {
+            labels: ['Stock', 'Cash'],
+            datasets: [{
+                data: [38000, 82000],
+                backgroundColor: ['#2d8cf0', '#f5a623'],
+                borderWidth: 0
+            }]
+        };
+        const config = {
+            type: 'pie',
+            data: data,
+            options: {
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        };
+        new Chart(document.getElementById('pieChart'), config);
+    </script>
+    <script type="module" src="./home.js"></script>
+</body>
+</html>
