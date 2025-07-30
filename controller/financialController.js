@@ -34,6 +34,16 @@ export const getExternalFinancialDataFromDB = async (req, res) => {
     }
 }
 
+// 从数据库获取最后一条金融数据
+export const getLastFinancialData = async (req, res) => {
+    try {
+        const lastFinancialData = await financialService.getLastFinancialData(req.query.ticker);
+        res.status(200).json({ message: 'Last financial data retrieved successfully.', data: lastFinancialData });
+    } catch (error) {
+        res.status(500).json({ message: 'Error retrieving last financial data.', error: error.message });
+    }
+}
+
 // Controller function to delete financial data table
 export const deleteFinancialData = async (req, res) => {
     try {

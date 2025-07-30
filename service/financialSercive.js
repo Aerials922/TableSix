@@ -207,3 +207,21 @@ export const updateFinancialData = async (tickers) => {
         }
     }
 }
+
+// 从数据库获取最后一条金融数据
+export const getLastFinancialData = async (ticker) => {
+    try {
+        let low_ticker = ticker.toLowerCase();
+        const [rows] = await connection.query(
+            `SELECT volume, open, close, high, low, timestamp FROM ${low_ticker}_pricedata ORDER BY timestamp DESC LIMIT 1`
+        );
+        if (rows.length === 0) {
+            console.warn(`No financial data found for ${ticker}.`);
+            return null;
+        }
+        return rows[0];
+    } catch (error) {
+        console.error(`Error fetching last financial data for ${ticker}:`, error);
+        return null;
+    }
+}
