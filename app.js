@@ -3,7 +3,7 @@ import cors from 'cors';
 import mysqlRoute from './route/mysqlRoute.js';
 import financialRoute from './route/financialRoute.js';
 import loginRoute from './route/loginRoute.js';
-
+import exchangeRoute from './route/exchangeRoute.js';
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -11,6 +11,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/tab_six/mysql', mysqlRoute);
 app.use('/tab_six/stock', financialRoute);
 app.use('/tab_six/', loginRoute);
+app.use('/tab_six/exchange', exchangeRoute);
 
 const PORT = 3000;
 app.listen(PORT, () => {
