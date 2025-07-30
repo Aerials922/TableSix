@@ -56,7 +56,12 @@ export const deleteFinancialData = async (req, res) => {
 // Controller function to update financial data
 export const updateFinancialData = async (req, res) => {
     try {
-        await financialService.updateFinancialData(req.query.ticker);
+        // 支持通过 body 或 query 传递 tickers，优先 body
+        let tickers = req.body?.tickers || req.query?.tickers;
+        if (typeof tickers === 'string') {
+            tickers = tickers.split(',').map(t => t.trim());
+        }
+        await financialService.updateFinancialData(tickers);
         res.status(200).json({ message: 'Financial data updated successfully.' });
     } catch (error) {
         res.status(500).json({ message: 'Error updating financial data.', error: error.message });
