@@ -147,6 +147,7 @@ function displayFinancialData(ticker) {
 
 
 
+
 // Single shared repos array for all logic
 let repos = [];
 const input = document.getElementById('searchInput');
@@ -290,33 +291,14 @@ document.addEventListener('click', function (e) {
 let portfolioData = {};
 const username = "t6";
 const userAssets = fetch(`http://localhost:3000/tab_six/position/get?username=${username}`);
+let DBCash = fetch(`http://localhost:3000/tab_six/user/getcash?username=${username}`);
 userAssets.then(response => response.json()).then(res => {
-    console.log(res);
-    // 假设 res.data 是资产数组
     const assets = res.data || [];
-    console.log("asset", assets);
-    let cashLeft = fetch(`http://localhost:3000/tab_six/user/getCash?username=${username}`);
-    cashLeft.then(response => response.json()).then(cashRes => {
-        console.log("cashLeft", cashRes);
-        portfolioData.cashLeft = cashRes.data;
-    });
-    // 你可以根据 assets 计算总值等
-    const totalCost = 10000000;
-    let currentTotalValue = totalCost;
     let totalGainLoss = 0;
-    portfolioData = {
-        totalCost,
-        currentTotalValue,
-        totalGainLoss,
-        assets
-    };
-    console.log(portfolioData);
-
     let stockValue = 0;
-    let cashValue = 0;
     let stockPurchaseValue = 0;
+    portfolioData = { assets };
 
-    // 渲染资产明细表格
     const tbody = document.getElementById('asset-tbody');
     tbody.innerHTML = '';
 
@@ -361,14 +343,18 @@ userAssets.then(response => response.json()).then(res => {
             })
     );
 
-    Promise.all(fetchList).then(() => {
-        // 这里所有异步都完成了，totalGainLoss才是最终值
-        console.log("totalGainLoss_final:", totalGainLoss);
-
-        currentTotalValue = totalCost + totalGainLoss;
+    // 关键：等 DBCash 和 fetchList 都完成后再渲染
+    Promise.all([
+        Promise.all(fetchList),
+        DBCash.then(response => response.json())
+    ]).then(([_, cashRes]) => {
+        let num = cashRes.data ?? cashRes.cash ?? cashRes.result ?? 0;
+        portfolioData.totalCost = Number(num) || 0;
+        const currentTotalValue = portfolioData.totalCost + Number(totalGainLoss) + stockValue;
+        totalGainLoss = currentTotalValue - 100000;
 
         // 渲染资产总览
-        document.getElementById('total-cost').textContent = `¥${portfolioData.totalCost.toFixed(2)}`;
+        document.getElementById('total-cost').textContent = `¥${portfolioData.totalCost}`;
         document.getElementById('current-value').textContent = `¥${currentTotalValue.toFixed(2)}`;
         document.getElementById('total-gain').textContent = (totalGainLoss >= 0 ? '+' : '') + `¥${totalGainLoss.toFixed(2)}`;
         document.getElementById('total-gain').className = 'overview-value ' + (totalGainLoss >= 0 ? 'has-text-success' : 'has-text-danger');
@@ -383,18 +369,27 @@ userAssets.then(response => response.json()).then(res => {
                     alert('Please enter a valid positive amount');
                     return;
                 }
-                // 更新totalCost并刷新显示
-                portfolioData.totalCost += num;
-                document.getElementById('total-cost').textContent = `¥${portfolioData.totalCost.toFixed(2)}`;
-                // 你可以在这里同步更新 currentTotalValue、totalGainLoss 等
-                // 例如：
-                const newCurrentTotalValue = portfolioData.totalCost + totalGainLoss;
-                document.getElementById('current-value').textContent = `¥${newCurrentTotalValue.toFixed(2)}`;
+                // 调用后端接口增加数据库中的Cash余额
+                fetch('http://localhost:3000/tab_six/user/updatecash', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, rechargeAmount: num })
+                })
+                    .then(res => res.json())
+                    .then(result => {
+                        if (result.success || result.message?.includes('successful')) {
+                            alert('Cash added successfully!');
+                            window.location.reload();
+                        } else {
+                            alert(result.message || 'Failed to add cash');
+                        }
+                    })
+                    .catch(() => alert('Network error, failed to add cash'));
             };
         }
 
         // 渲染饼图
-        const cashValue = portfolioData.totalCost - stockPurchaseValue;
+        const cashValue = portfolioData.totalCost;
         const data = {
             labels: ['Stock', 'Cash'],
             datasets: [{
@@ -464,22 +459,35 @@ if (buyingBtn) {
                 alert('请输入有效的购买数量');
                 return;
             }
-            console.log(`Buying button clicked for ticker: ${ticker}, amount: ${amount}`, `username: ${username}`);
-            fetch('http://localhost:3000/tab_six/exchange/buyingin', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, ticker, amount })
-            })
-            .then(res => res.json())
-            .then(result => {
-                if (result.success || result.message?.includes('successful')) {
-                    alert('Buy successful!');
-                    window.location.reload();
-                } else {
-                    alert(result.message || 'Buy failed');
-                }
-            })
-            .catch(() => alert('Network error, buy failed'));
+            // 获取当前价格
+            fetch(`http://localhost:3000/tab_six/stock/getLastFromDB?ticker=${ticker}`)
+                .then(response => response.json())
+                .then(data => {
+                    const currentPrice = Number(data.data.close);
+                    const totalCost = currentPrice * amount;
+                    // 检查余额
+                    if (totalCost > Number(portfolioData.totalCost)) {
+                        alert(`余额不足，购买失败！当前可用余额：¥${portfolioData.totalCost}，所需：¥${totalCost.toFixed(2)}`);
+                        return;
+                    }
+                    // 余额充足，发起购买
+                    fetch('http://localhost:3000/tab_six/exchange/buyingin', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, ticker, amount })
+                    })
+                        .then(res => res.json())
+                        .then(result => {
+                            if (result.success || result.message?.includes('successful')) {
+                                alert('Buy successful!');
+                                window.location.reload();
+                            } else {
+                                alert(result.message || 'Buy failed');
+                            }
+                        })
+                        .catch(() => alert('Network error, buy failed'));
+                })
+                .catch(() => alert('获取股票价格失败'));
         } else {
             alert('Please select a stock code first!');
         }

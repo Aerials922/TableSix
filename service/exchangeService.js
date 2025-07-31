@@ -58,14 +58,19 @@ export const buyingOut = async (username, ticker, amount) => {
         const price = priceRows[0].close;
         const userId = rows[0].id;
         if (rows.length != 0) {
-            const queryToBuyingOut = 'UPDATE positions SET amount = amount - ?, price = ? WHERE user_id = ? AND ticker = ?';
-            await connection.query(queryToBuyingOut, [amount, price, userId, ticker]);
+            const queryToBuyingOut = 'UPDATE positions SET amount = amount - ? WHERE user_id = ? AND ticker = ?';
+            await connection.query(queryToBuyingOut, [amount, userId, ticker]);
 
             // 查询当前持仓数量
             const [positionRows] = await connection.query(
                 'SELECT amount FROM positions WHERE user_id = ? AND ticker = ?',
                 [userId, ticker]
             );
+
+            // 修改user表中的现金余额
+            const queryToUpdateCash = 'UPDATE user SET cash = cash + ? * ? WHERE id = ?';
+            await connection.query(queryToUpdateCash, [amount, price, userId]);
+            
             if (positionRows.length > 0 && Number(positionRows[0].amount) <= 0.000001) {
                 // 删除
                 await connection.query(
@@ -74,9 +79,7 @@ export const buyingOut = async (username, ticker, amount) => {
                 );
             }
 
-            // 修改user表中的现金余额
-            const queryToUpdateCash = 'UPDATE user SET cash = cash + ? * ? WHERE id = ?';
-            await connection.query(queryToUpdateCash, [amount, price, userId]);
+
             return {
                 username,
                 ticker,

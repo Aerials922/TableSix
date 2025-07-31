@@ -17,9 +17,12 @@
         <div class="container">
             <div class="box">
                 <div class="hero is-primary">
-                    <div class="hero-body has-text-centered">
-                        <h1 class="title is-2">T.6 FINANCE HUB</h1>
-                        <h1 class="title is-2" id="slogan">From Broke to Millionaire !!!</h1>
+                    <div class="hero-body" style="display: flex; align-items: center; justify-content: center;">
+                        <img src="../img/logo.png" alt="Logo" style="height:130px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); background: #fff; padding: 8px; margin-right: 120px;">
+                        <div class="has-text-centered">
+                            <h1 class="title is-2">T.6 FINANCE HUB</h1>
+                            <h1 class="title is-2" id="slogan">From Broke to Millionaire !!!</h1>
+                        </div>
                     </div>
                 </div>
 
@@ -64,7 +67,7 @@
                     <div class="panel-block">
                         <div style="width:100%; display:flex; justify-content:center; gap: 12px;">
                             <button class="button is-primary" id="submitButton">
-                                Submit
+                                Search
                             </button>
                             <button class="button is-success" id="buyingButton">
                                 Buying
@@ -99,7 +102,7 @@
                 <div class="column">
                     <div class="box overview-item" style="display: flex; align-items: center; justify-content: space-between;">
                         <div>
-                            <div class="overview-label">Total Cost</div>
+                            <div class="overview-label">Cash Left</div>
                             <div class="overview-value" id="total-cost"></div>
                         </div>
                         <button id="add-total-cost" class="button is-small is-primary" style="margin-left: 16px;">ADD</button>
@@ -107,7 +110,7 @@
                 </div>
                 <div class="column">
                     <div class="box overview-item">
-                        <div class="overview-label">Current Value</div>
+                        <div class="overview-label">Total Value</div>
                         <div class="overview-value" id="current-value"></div>
                     </div>
                 </div>
@@ -125,8 +128,10 @@
                         <div class="pie-chart-title">Asset Allocation</div>
                         <canvas id="pieChart" width="200" height="200"></canvas>
                         <div style="margin-top:16px;">
-                            <span class="legend-dot legend-stock"></span> Stock
-                            <span class="legend-dot legend-cash" style="margin-left:18px;"></span> Cash
+                            <span class="legend-dot legend-stock" style="background-color:#3273dc; display:inline-block; width:12px; height:12px; border-radius:50%;"></span>
+                            <span style="margin-left:6px;">Stock</span>
+                            <span class="legend-dot legend-cash" style="background-color:rgb(245,166,36); display:inline-block; width:12px; height:12px; border-radius:50%; margin-left:18px;"></span>
+                            <span style="margin-left:6px;">Cash</span>
                         </div>
                     </div>
                 </div>
