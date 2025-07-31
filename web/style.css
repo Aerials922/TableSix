@@ -1,7 +1,7 @@
 .display_1x4 {
     display: flex;
     justify-content: center;
-    gap: 40px;
+    gap: 120px; /* 原来是40px，改为80px更稀疏 */
     margin: 20px 0;
 }
 

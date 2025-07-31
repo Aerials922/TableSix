@@ -13,3 +13,8 @@ generalAsset{
     "Current Value"（当前资产）:
     "Total Gain/Loss"（总盈亏）:
 }
+
+
+查询用户cash
+
+买入

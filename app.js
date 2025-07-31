@@ -14,6 +14,10 @@ app.use('/tab_six/stock', financialRoute);
 app.use('/tab_six/', loginRoute);
 app.use('/tab_six/exchange', exchangeRoute);
 app.use('/tab_six/position', positionRoute);
+// 访问 /TableSix 时重定向到登录页
+app.get('/TableSix', (req, res) => {
+    res.redirect('/TableSix/web/login.html');
+});
 const PORT = 3000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

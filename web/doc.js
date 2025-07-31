@@ -87,8 +87,15 @@ function displayFinancialData(ticker) {
                         x: {
                             stacked: false,
                             ticks: {
+                                autoSkip: true,
+                                maxTicksLimit: 10, // 最多显示10个刻度
                                 callback: function (value, index, ticks) {
-                                    return index % 5 === 0 ? this.getLabelForValue(value) : '';
+                                    // 精简为 "MM-DD" 或 "HH:mm"
+                                    const label = this.getLabelForValue(value);
+                                    if (label && label.length >= 16) {
+                                        return label.slice(5, 10) + ' ' + label.slice(11, 16);
+                                    }
+                                    return label;
                                 },
                                 maxRotation: 45,
                                 minRotation: 45
@@ -163,7 +170,7 @@ function renderRepoList() {
     const repoList = document.getElementById('repoList');
     repoList.style.maxHeight = "200px";
     repoList.style.overflowY = "auto";
-    repoList.innerHTML = repos.slice(0, 5).map(r => `
+    repoList.innerHTML = repos.map(r => `
         <a class="panel-block" id="CompanyStockID"> 
             <span class="panel-icon">
                 <i class="fas fa-book" aria-hidden="true"></i>
@@ -200,6 +207,11 @@ function renderRepoList() {
 }
 
 // Summit 按钮点击事件
+const stockTableContainer = document.getElementById('stock-table-container');
+if (stockTableContainer) {
+    stockTableContainer.style.display = 'none'; // 初始隐藏
+}
+
 const summitBtn = document.querySelector('#submitButton');
 if (summitBtn) {
     summitBtn.addEventListener('click', function () {
@@ -210,6 +222,11 @@ if (summitBtn) {
             const ticker = activateStockID.textContent.trim();
             console.log(`Summit button clicked for ticker: ${ticker}`);
             displayFinancialData(ticker);
+
+            // 显示表格容器
+            if (stockTableContainer) {
+                stockTableContainer.style.display = '';
+            }
         } else {
             alert('请先选择一个股票代码!');
         }
@@ -269,27 +286,22 @@ document.addEventListener('click', function (e) {
     }
 });
 
-// 示例数据，实际可通过fetch从后端获取
-const DportfolioData = {
-    totalCost: 100000,
-    currentValue: 120000,
-    totalGain: 50000,
-    assets: [
-        { type: 'Stock', name: '招商银行', quantity: 500, value: 20000, gain: 2000 },
-        { type: 'Stock', name: '贵州茅台', quantity: 100, value: 18000, gain: 1500 },
-        { type: 'Cash', name: '人民币', quantity: '--', value: 82000, gain: null }
-    ]
-};
+
 let portfolioData = {};
-const username = "ekko";
+const username = "t6";
 const userAssets = fetch(`http://localhost:3000/tab_six/position/get?username=${username}`);
 userAssets.then(response => response.json()).then(res => {
     console.log(res);
     // 假设 res.data 是资产数组
     const assets = res.data || [];
     console.log("asset", assets);
+    let cashLeft = fetch(`http://localhost:3000/tab_six/user/getCash?username=${username}`);
+    cashLeft.then(response => response.json()).then(cashRes => {
+        console.log("cashLeft", cashRes);
+        portfolioData.cashLeft = cashRes.data;
+    });
     // 你可以根据 assets 计算总值等
-    const totalCost = 100000;
+    const totalCost = 10000000;
     let currentTotalValue = totalCost;
     let totalGainLoss = 0;
     portfolioData = {
@@ -317,11 +329,18 @@ userAssets.then(response => response.json()).then(res => {
                 let currentGainLoss = (currentPrice - asset.price) * asset.amount;
                 tr.innerHTML = `
                     <td>STOCK</td>
-                    <td>${asset.ticker}</td>
+                    <td>${asset.ticker.toUpperCase()}</td>
                     <td>${asset.amount}</td>
                     <td>¥${asset.price}</td>
                     <td>¥${currentPrice.toFixed(2)}</td>
                     <td>¥${currentGainLoss.toFixed(2)}</td>
+                    <td>
+                        <button class="button is-small is-danger sell-btn"
+                            data-ticker="${asset.ticker}"
+                            data-amount="${asset.amount}">
+                            Sell
+                        </button>
+                    </td>
                 `;
                 stockValue += (currentPrice * asset.amount);
                 stockPurchaseValue += (asset.price * asset.amount);
@@ -352,7 +371,27 @@ userAssets.then(response => response.json()).then(res => {
         document.getElementById('total-cost').textContent = `¥${portfolioData.totalCost.toFixed(2)}`;
         document.getElementById('current-value').textContent = `¥${currentTotalValue.toFixed(2)}`;
         document.getElementById('total-gain').textContent = (totalGainLoss >= 0 ? '+' : '') + `¥${totalGainLoss.toFixed(2)}`;
-        document.getElementById('total-gain').className = 'overview-value ' + (totalGainLoss >= 0 ? 'has-text-success' : 'has-text-danger') ;
+        document.getElementById('total-gain').className = 'overview-value ' + (totalGainLoss >= 0 ? 'has-text-success' : 'has-text-danger');
+
+        // 绑定ADD按钮事件
+        const addBtn = document.getElementById('add-total-cost');
+        if (addBtn) {
+            addBtn.onclick = function () {
+                const addValue = prompt('Please enter the amount to add (CNY):');
+                const num = Number(addValue);
+                if (isNaN(num) || num <= 0) {
+                    alert('Please enter a valid positive amount');
+                    return;
+                }
+                // 更新totalCost并刷新显示
+                portfolioData.totalCost += num;
+                document.getElementById('total-cost').textContent = `¥${portfolioData.totalCost.toFixed(2)}`;
+                // 你可以在这里同步更新 currentTotalValue、totalGainLoss 等
+                // 例如：
+                const newCurrentTotalValue = portfolioData.totalCost + totalGainLoss;
+                document.getElementById('current-value').textContent = `¥${newCurrentTotalValue.toFixed(2)}`;
+            };
+        }
 
         // 渲染饼图
         const cashValue = portfolioData.totalCost - stockPurchaseValue;
@@ -374,9 +413,76 @@ userAssets.then(response => response.json()).then(res => {
             }
         };
         new Chart(document.getElementById('pieChart'), config);
+
+        // 卖出按钮事件绑定
+        document.querySelectorAll('.sell-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const ticker = this.getAttribute('data-ticker');
+                const maxAmount = Number(this.getAttribute('data-amount'));
+                const sellAmount = prompt(`Please enter the amount of ${ticker} to sell (max ${maxAmount}):`);
+                if (!sellAmount) return;
+                const num = Number(sellAmount);
+                if (isNaN(num) || num <= 0 || num > maxAmount) {
+                    alert('Please enter a valid amount to sell');
+                    return;
+                }
+                const username = 't6';
+                fetch('http://localhost:3000/tab_six/exchange/buyingout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, ticker, amount: num })
+                })
+                    .then(res => res.json())
+                    .then(result => {
+                        if (result.success || result.message?.includes('successful')) {
+                            alert('Sell successful!');
+                            window.location.reload();
+                        } else {
+                            alert(result.message || 'Sell failed');
+                        }
+                    })
+                    .catch(() => alert('Network error, sell failed'));
+            });
+        });
     });
 
 }).catch(error => {
     console.error('Error fetching user assets:', error);
 });
+
+const buyingBtn = document.getElementById('buyingButton');
+if (buyingBtn) {
+    buyingBtn.addEventListener('click', function () {
+        // 查找已激活的 panel-block
+        const activateStockID = document.querySelector('#repoList .panel-block.is-active');
+        if (activateStockID) {
+            // 获取 ticker 内容
+            const ticker = activateStockID.textContent.trim();
+            const amountStr = prompt(`请输入要购买的 ${ticker} 数量:`);
+            const amount = Number(amountStr);
+            if (!amountStr || isNaN(amount) || amount <= 0) {
+                alert('请输入有效的购买数量');
+                return;
+            }
+            console.log(`Buying button clicked for ticker: ${ticker}, amount: ${amount}`, `username: ${username}`);
+            fetch('http://localhost:3000/tab_six/exchange/buyingin', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, ticker, amount })
+            })
+            .then(res => res.json())
+            .then(result => {
+                if (result.success || result.message?.includes('successful')) {
+                    alert('Buy successful!');
+                    window.location.reload();
+                } else {
+                    alert(result.message || 'Buy failed');
+                }
+            })
+            .catch(() => alert('Network error, buy failed'));
+        } else {
+            alert('Please select a stock code first!');
+        }
+    });
+}
 

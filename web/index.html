@@ -62,40 +62,47 @@
                         style="display:none; position:absolute; z-index:100; width:90%; margin-left:5%;"></div>
                     <div id="repoList"></div>
                     <div class="panel-block">
-                        <div style="width:100%; display:flex; justify-content:center;">
+                        <div style="width:100%; display:flex; justify-content:center; gap: 12px;">
                             <button class="button is-primary" id="submitButton">
                                 Submit
+                            </button>
+                            <button class="button is-success" id="buyingButton">
+                                Buying
                             </button>
                         </div>
                     </div>
                 </nav>
                 <div class="hero is-primary" id="stock_info"></div>
-                <canvas id="stock-chart"></canvas>
+                <canvas id="stock-chart" style="display: none;"></canvas>
             </div>
         </div>
 
-        <div class="container" style="max-height: 400px; overflow-y: auto;">
+        <div class="container" id="stock-table-container" style="max-height: 400px; overflow-y: auto; display: none;">
             <div class="box">
-                <table id="stock-table" class="table is-striped is-fullwidth">
-                    <thead>
-                        <!-- 动态插入表头 -->
-                    </thead>
-                    <tbody>
-                        <!-- 动态插入数据 -->
-                    </tbody>
-                </table>
+            <table id="stock-table" class="table is-striped is-fullwidth">
+                <thead>
+                <!-- 动态插入表头 -->
+                </thead>
+                <tbody>
+                <!-- 动态插入数据 -->
+                </tbody>
+            </table>
             </div>
         </div>
 
         <!-- 资产管理页面 -->
         <div class="container">
+            <div style="height: 24px;"></div>
             <h1 class="title has-text-centered mb-5">Portfolio Management</h1>
             <!-- 资产总览 -->
             <div class="columns is-variable is-4 mb-5">
                 <div class="column">
-                    <div class="box overview-item">
-                        <div class="overview-label">Total Cost</div>
-                        <div class="overview-value" id="total-cost"></div>
+                    <div class="box overview-item" style="display: flex; align-items: center; justify-content: space-between;">
+                        <div>
+                            <div class="overview-label">Total Cost</div>
+                            <div class="overview-value" id="total-cost"></div>
+                        </div>
+                        <button id="add-total-cost" class="button is-small is-primary" style="margin-left: 16px;">ADD</button>
                     </div>
                 </div>
                 <div class="column">
@@ -136,6 +143,7 @@
                                     <th>Purchase Price</th>
                                     <th>Current Price</th>
                                     <th>Gain/Loss</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody id="asset-tbody">

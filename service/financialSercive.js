@@ -9,24 +9,6 @@ const OUTPUT_SIZE = 'compact'; // 可选值：compact 或 full
 const API_KEY = 'NDUWW8NOMS7G2JCB';
 const INTERVAL = '30min';   // 1min 5min 15min 30min 60min
 let user_tickers = ["TSLA", "IBM", "GOOG", "AAPL", "FB", "GE", "HLT", "NFLX", "NVDA", "AMD"]; // 自定义的股票列表
-// getFinancialData function to fetch financial data
-// export const getFinancialData = async (ticker) => {
-//     const url = src + ticker
-//     // 用于存储所有 volume 的数组
-//     let volumes = [];
-//     try {
-//         // Fetch financial data from the service
-//         const financialResponse = await axios.get(url);
-
-//         let financialData = financialResponse.data;
-
-//         saveFinancialData(ticker, financialData);
-//         return financialData;
-
-//     } catch (error) {
-//         throw new Error('Error fetching financial data: ' + error.message);
-//     }
-// }
 
 // 获取外部API的金融数据
 export const getExternalFinancialData = async (ticker) => {
