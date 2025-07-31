@@ -74,15 +74,17 @@
             </div>
         </div>
 
-        <div class="container">
-            <table id="stock-table" class="table is-striped is-fullwidth">
-                <thead>
-                    <!-- 动态插入表头 -->
-                </thead>
-                <tbody>
-                    <!-- 动态插入数据 -->
-                </tbody>
-            </table>
+        <div class="container" style="max-height: 400px; overflow-y: auto;">
+            <div class="box">
+                <table id="stock-table" class="table is-striped is-fullwidth">
+                    <thead>
+                        <!-- 动态插入表头 -->
+                    </thead>
+                    <tbody>
+                        <!-- 动态插入数据 -->
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <!-- 资产管理页面 -->
@@ -131,7 +133,8 @@
                                     <th>Asset Type</th>
                                     <th>Name</th>
                                     <th>Quantity</th>
-                                    <th>Current Value</th>
+                                    <th>Purchase Price</th>
+                                    <th>Current Price</th>
                                     <th>Gain/Loss</th>
                                 </tr>
                             </thead>

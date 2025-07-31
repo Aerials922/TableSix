@@ -15,7 +15,7 @@ let stockChartInstance = null;
 // }
 
 function displayFinancialData(ticker) {
-    fetch(`http://localhost:3000/tab_six/stock/external?ticker=${encodeURIComponent(ticker)}`)
+    fetch(`http://localhost:3000/tab_six/stock/getFromDB?ticker=${encodeURIComponent(ticker)}`)
         .then(res => res.json())
         .then(result => {
             const data = result.data;
@@ -64,10 +64,10 @@ function displayFinancialData(ticker) {
             const chart_data = {
                 labels: data.timestamps,
                 datasets: [
-                    {label: 'open', data: data.opens, backgroundColor: 'rgba(54, 162, 235, 0.6)'},
-                    {label: 'close', data: data.closes, backgroundColor: 'rgba(255, 99, 132, 0.6)'},
-                    {label: 'high', data: data.highs, backgroundColor: 'rgba(255, 206, 86, 0.6)'},
-                    {label: 'low', data: data.lows, backgroundColor: 'rgba(75, 192, 192, 0.6)'}
+                    { label: 'open', data: data.opens, backgroundColor: 'rgba(54, 162, 235, 0.6)' },
+                    { label: 'close', data: data.closes, backgroundColor: 'rgba(255, 99, 132, 0.6)' },
+                    { label: 'high', data: data.highs, backgroundColor: 'rgba(255, 206, 86, 0.6)' },
+                    { label: 'low', data: data.lows, backgroundColor: 'rgba(75, 192, 192, 0.6)' }
                 ]
             };
 
@@ -270,7 +270,7 @@ document.addEventListener('click', function (e) {
 });
 
 // 示例数据，实际可通过fetch从后端获取
-const portfolioData = {
+const DportfolioData = {
     totalCost: 100000,
     currentValue: 120000,
     totalGain: 50000,
@@ -280,53 +280,103 @@ const portfolioData = {
         { type: 'Cash', name: '人民币', quantity: '--', value: 82000, gain: null }
     ]
 };
+let portfolioData = {};
+const username = "ekko";
+const userAssets = fetch(`http://localhost:3000/tab_six/position/get?username=${username}`);
+userAssets.then(response => response.json()).then(res => {
+    console.log(res);
+    // 假设 res.data 是资产数组
+    const assets = res.data || [];
+    console.log("asset", assets);
+    // 你可以根据 assets 计算总值等
+    const totalCost = 100000;
+    let currentTotalValue = totalCost;
+    let totalGainLoss = 0;
+    portfolioData = {
+        totalCost,
+        currentTotalValue,
+        totalGainLoss,
+        assets
+    };
+    console.log(portfolioData);
 
+    let stockValue = 0;
+    let cashValue = 0;
+    let stockPurchaseValue = 0;
 
+    // 渲染资产明细表格
+    const tbody = document.getElementById('asset-tbody');
+    tbody.innerHTML = '';
 
-// 渲染资产总览
-document.getElementById('total-cost').textContent = `¥${portfolioData.totalCost.toLocaleString()}`;
-document.getElementById('current-value').textContent = `¥${portfolioData.currentValue.toLocaleString()}`;
-const gain = portfolioData.totalGain;
-document.getElementById('total-gain').textContent = (gain >= 0 ? '+' : '') + `¥${gain.toLocaleString()}`;
-document.getElementById('total-gain').className = 'overview-value ' + (gain >= 0 ? 'has-text-success' : 'has-text-danger');
+    const fetchList = portfolioData.assets.map(asset =>
+        fetch(`http://localhost:3000/tab_six/stock/getLastFromDB?ticker=${asset.ticker}`)
+            .then(response => response.json())
+            .then(data => {
+                let currentPrice = Number(data.data.close);
+                const tr = document.createElement('tr');
+                let currentGainLoss = (currentPrice - asset.price) * asset.amount;
+                tr.innerHTML = `
+                    <td>STOCK</td>
+                    <td>${asset.ticker}</td>
+                    <td>${asset.amount}</td>
+                    <td>¥${asset.price}</td>
+                    <td>¥${currentPrice.toFixed(2)}</td>
+                    <td>¥${currentGainLoss.toFixed(2)}</td>
+                `;
+                stockValue += (currentPrice * asset.amount);
+                stockPurchaseValue += (asset.price * asset.amount);
+                totalGainLoss += currentGainLoss;
+                tbody.appendChild(tr);
+            })
+            .catch(error => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>STOCK</td>
+                    <td>${asset.ticker}</td>
+                    <td>${asset.amount}</td>
+                    <td>¥${asset.price}</td>
+                    <td>获取失败</td>
+                    <td>--</td>
+                `;
+                tbody.appendChild(tr);
+            })
+    );
 
-// 渲染资产明细表格
-const tbody = document.getElementById('asset-tbody');
-tbody.innerHTML = '';
-portfolioData.assets.forEach(asset => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-        <td>${asset.type}</td>
-        <td>${asset.name}</td>
-        <td>${asset.quantity}</td>
-        <td>¥${asset.value.toLocaleString()}</td>
-        <td class="${asset.gain === null ? '' : (asset.gain >= 0 ? 'has-text-success' : 'has-text-danger')}">
-            ${asset.gain === null ? '--' : (asset.gain >= 0 ? '+' : '') + '¥' + asset.gain.toLocaleString()}
-        </td>
-    `;
-    tbody.appendChild(tr);
+    Promise.all(fetchList).then(() => {
+        // 这里所有异步都完成了，totalGainLoss才是最终值
+        console.log("totalGainLoss_final:", totalGainLoss);
+
+        currentTotalValue = totalCost + totalGainLoss;
+
+        // 渲染资产总览
+        document.getElementById('total-cost').textContent = `¥${portfolioData.totalCost.toFixed(2)}`;
+        document.getElementById('current-value').textContent = `¥${currentTotalValue.toFixed(2)}`;
+        document.getElementById('total-gain').textContent = (totalGainLoss >= 0 ? '+' : '') + `¥${totalGainLoss.toFixed(2)}`;
+        document.getElementById('total-gain').className = 'overview-value ' + (totalGainLoss >= 0 ? 'has-text-success' : 'has-text-danger') ;
+
+        // 渲染饼图
+        const cashValue = portfolioData.totalCost - stockPurchaseValue;
+        const data = {
+            labels: ['Stock', 'Cash'],
+            datasets: [{
+                data: [stockValue, cashValue],
+                backgroundColor: ['#2d8cf0', '#f5a623'],
+                borderWidth: 0
+            }]
+        };
+        const config = {
+            type: 'pie',
+            data: data,
+            options: {
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        };
+        new Chart(document.getElementById('pieChart'), config);
+    });
+
+}).catch(error => {
+    console.error('Error fetching user assets:', error);
 });
-
-// 渲染饼图
-const stockValue = portfolioData.assets.filter(a => a.type === 'Stock').reduce((sum, a) => sum + a.value, 0);
-const cashValue = portfolioData.assets.filter(a => a.type === 'Cash').reduce((sum, a) => sum + a.value, 0);
-
-const data = {
-    labels: ['Stock', 'Cash'],
-    datasets: [{
-        data: [stockValue, cashValue],
-        backgroundColor: ['#2d8cf0', '#f5a623'],
-        borderWidth: 0
-    }]
-};
-const config = {
-    type: 'pie',
-    data: data,
-    options: {
-        plugins: {
-            legend: { display: false }
-        }
-    }
-};
-new Chart(document.getElementById('pieChart'), config);
 
