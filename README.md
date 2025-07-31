@@ -1,104 +1,150 @@
-# 实时股票追踪网站 (Real-Time Stock Tracker)
+# Real-Time Stock Tracking and Trading Website
 
-一个功能强大的全栈Web应用，旨在为用户提供快速、准确的美股实时行情数据和可视化图表。项目采用前后端分离架构，完全由 JavaScript 技术栈构建。
 
-## 🚀 项目简介
 
-本项目是一个实时股票信息展示平台，专注于美股市场。它通过调用 Alpha Vantage 金融数据API，实时获取近千家公司的股票数据，并将这些信息高效地存入位于首尔云服务器的MySQL数据库中。前端界面负责清晰地展示数据，通过交互式图表和详细的数据列表，帮助用户直观地了解市场动态。后端服务不仅负责数据的获取和存储，还实现了一整套完整的CRUD（创建、读取、更新、删除）数据管理接口，为项目的稳定性和可扩展性提供了坚实的基础。
+A powerful full-stack web application designed to provide users with fast and accurate real-time U.S. stock market data, interactive charts, and a virtual trading platform. The project adopts a decoupled front-end and back-end architecture, built entirely with a JavaScript technology stack.
 
-## ✨ 用户体验 (User Experience)
 
-我们致力于提供简洁、直观、高效的用户体验，核心亮点如下：
 
-* **动态数据更新**：前端通过与后端建立的长连接，实时接收最新数据推送，无需手动刷新页面，即可掌握瞬息万变的市场行情。
-* **直观的数据可视化**：我们使用动态数据曲线图来展示每支股票的价格走势、交易量等关键指标，帮助用户快速识别趋势和模式。
-* **便捷的公司选择**：系统内置了近1000家热门美股公司的列表。我们建立了美股代码与中文名称的对照关系，用户可以通过搜索或筛选快速找到关心的公司。
-* **详尽的股票信息**：除了价格曲线，我们还提供了每支股票的详细信息，包括：
-    * 开盘价
-    * 收盘价
-    * 最高价
-    * 最低价
-    * 成交量
-* **响应式设计**：网站界面完美适配桌面电脑、平板和手机等不同尺寸的设备，确保用户在任何设备上都能获得一致的优质体验。
+## 🚀 Project Overview
 
-## 🛠️ 技术细节 (Technical Details)
 
-#### **技术栈 (Technology Stack)**
 
-| 类别                | 技术                                                              | 描述                                                               |
-| ------------------- | ----------------------------------------------------------------- | ------------------------------------------------------------------ |
-| **前端 (Frontend)** | `JavaScript (ES6+)`, `HTML5`, `CSS3`, `Chart.js` (或其他图表库) | 负责构建用户界面、数据可视化和用户交互。                           |
-| **后端 (Backend)** | `Node.js`, `Express.js`, `Axios`                                  | 构建稳定、高效的服务器，提供RESTful API和WebSocket服务。         |
-| **数据库 (Database)** | `MySQL` (部署于首尔云服务器)                                    | 基于云的远程数据库，用于持久化存储股票行情数据和公司信息。         |
-| **数据源 (Data Source)** | `Alpha Vantage`                                                   | 项目的核心数据来源，提供实时和历史股票数据。                       |
-| **实时通信** | `Fetch`                                       | 实现后端到前端的数据实时推送，降低延迟，提升用户体验。             |
+This project is a real-time stock information display and trading platform focused on the U.S. stock market. It retrieves real-time stock data for nearly a thousand companies by calling the Alpha Vantage financial data API, and efficiently stores this information in a MySQL database on a Seoul cloud server. The front-end interface is responsible for displaying the data clearly, using interactive charts and detailed data lists to help users intuitively understand market dynamics. The back-end service not only handles data retrieval and storage but also implements a complete set of CRUD (Create, Read, Update, Delete) data management interfaces, along with new features for user registration, login, virtual trading, and personal asset management, providing a solid foundation for the project's stability and scalability.
 
----
 
-#### **系统架构 (Architecture)**
 
-![架构图](https://zb666-1300332882.cos.ap-beijing.myqcloud.com/blog/FFFFFF)
-*<center>一个简单的架构示意图，您可以替换为您自己的图表。</center>*
+## ✨ User Experience (User Experience)
 
-1.  **后端API服务 (Backend)**
-    * **RESTful API**: 使用 `Express.js` 搭建，提供标准的HTTP接口。前端在首次加载时，会调用这些接口来获取公司列表、指定股票的历史数据等基础信息。
-    * **CRUD接口**: 实现了对数据库中股票数据的增、删、改、查的全套管理功能，并已与前端连接。
-2.  **前端应用 (Frontend)**
-    * **初始化**: 页面加载时，通过RESTful API获取所有公司的列表。
-    * **用户交互**: 用户选择一家公司后，前端会请求该公司的详细历史数据以绘制初始图表。
-    * **实时更新**: 前端通过WebSocket客户端监听来自服务器的数据推送。一旦收到新数据，会立即更新页面上的价格显示和图表，实现实时动态效果。
-    * **中美映射**: 前端内置一个映射文件（如`mapping.json`）或从后端获取，用于将股票代码（如 `AAPL`）与公司中文名（如 `苹果公司`）进行关联展示。
 
-## ⚙️ 如何安装与运行
 
-#### **先决条件**
+We are committed to providing a simple, intuitive, and efficient user experience, with the following core highlights:
 
-* `Node.js` (版本 16.x 或更高)
-* `npm` 或 `yarn`
-* `MySQL` 客户端
+- **Dynamic Data Updates**: The front-end establishes a long connection with the back-end to receive real-time data pushes, allowing users to keep up with the fast-changing market without manually refreshing the page.
+- **Intuitive Data Visualization**: We use dynamic data charts to display key metrics such as each stock's price trend and trading volume, helping users quickly identify trends and patterns.
+- **Convenient Company Selection**: The system includes a built-in list of nearly 1,000 popular U.S. stock companies. We have established a mapping between U.S. stock tickers and Chinese company names, allowing users to quickly find companies of interest through search or filtering.
+- **Detailed Stock Information**: In addition to price charts, we also provide detailed information for each stock, including:
+  - Opening price
+  - Closing price
+  - Highest price
+  - Lowest price
+  - Trading volume
+- **Responsive Design**: The website interface is perfectly adapted to different screen sizes, such as desktops, tablets, and mobile phones, ensuring a consistent and high-quality user experience on any device.
+- **User Account and Asset Management**: Users can register and log in to a personal account to view their stock holdings, available funds, and total asset value on the personal assets page.
+- **Virtual Trading Functionality**: Users can perform stock buy and sell operations to simulate a real investment experience.
+- **Profit and Loss Calculation**: The system automatically calculates and displays the profit and loss for each trade and the total portfolio, helping users evaluate their investment performance.
 
-#### **后端设置**
 
-1.  克隆仓库:
-    ```bash
-    git clone [您的仓库地址]
-    cd [项目目录]/backend
-    ```
-2.  安装依赖:
-    ```bash
-    npm install
-    ```
-3.  配置环境变量:
-    * 在`config/mysql.js`文件内进行配置。
-    * 在文件中添加必要的环境变量，如数据库连接字符串和Alpha Vantage API密钥。
-    ```
-    # MySQL 连接信息
-    import mysql from 'mysql2/promise';
-    const connection = mysql.createPool({
-        host: 'IP',
-        user: 'username',
-        password: 'passwd',
-        database: 'table_six',
-    });
-    export default connection;
-    ```
-4.  启动后端服务:
-    ```bash
-    npm start
-    ```
 
-#### **前端设置**
+## 🛠️ Technical Details (Technical Details)
 
-1.  进入前端目录:
-    ```bash
-    cd ../frontend
-    ```
-2.  安装依赖:
-    ```bash
-    npm install
-    ```
-3.  启动前端开发服务器:
-    ```bash
-    npm start
-    ```
-4.  在浏览器中打开 `http://localhost:3000` (或您配置的端口) 即可访问。
+
+
+#### **Technology Stack**
+
+
+
+| Category        | Technology                                                   | Description                                                  |
+| --------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| **Frontend**    | `React.js` (or other modern front-end frameworks like Vue.js) | Responsible for building the user interface, data visualization, and user interactions. Component-based development is used to improve code reusability and maintainability. |
+|                 | `Chart.js` (or other chart libraries like Echarts, Highcharts) | Used to draw dynamic, interactive charts for stock prices and trading volumes. |
+|                 | `Axios`                                                      | Responsible for making HTTP requests to the back-end to get initial and historical data. |
+|                 | `WebSocket` (or `Socket.IO`)                                 | Used to establish a real-time long connection from the back-end to the front-end, pushing the latest stock market data to enable dynamic updates. |
+| **Backend**     | `Node.js`                                                    | The back-end runtime environment, featuring high concurrency and non-blocking I/O. |
+|                 | `Express.js`                                                 | A web framework based on Node.js, used to quickly build RESTful APIs and WebSocket services. |
+|                 | `Sequelize` (or other ORMs like Mongoose)                    | An Object-Relational Mapping (ORM) tool that simplifies interaction with the MySQL database, enabling the definition of data models and database operations. |
+|                 | `JSON Web Tokens (JWT)`                                      | Used for user authentication and authorization to ensure API call security. |
+| **Database**    | `MySQL` (deployed on a Seoul cloud server)                   | A remote relational database used for persistent storage of stock market data, company information, user account details, and transaction records. |
+| **Data Source** | `Alpha Vantage`                                              | The core data source for the project, providing real-time and historical stock data. |
+
+------
+
+
+
+#### **System Architecture**
+
+
+
+*<center>A simple architectural diagram, which you can replace with your own chart.</center>*
+
+1. **Backend API Service**
+   - **RESTful API**: Built with `Express.js`, providing standard HTTP interfaces. The front-end calls these interfaces on initial load to get a list of companies, historical data for a specific stock, and other basic information.
+   - **CRUD Interfaces**: Implements a complete set of management functions for adding, deleting, modifying, and querying stock data in the database, and is connected to the front-end.
+   - **Authentication and Authorization**: New user registration and login interfaces are added, using JWT (JSON Web Tokens) to ensure secure user sessions.
+   - **Trading Service**: Adds interfaces to handle the logic for buying and selling stocks. During each transaction, it verifies the user's available funds and holdings, and updates personal assets and transaction records in the database.
+2. **Frontend Application**
+   - **Initialization**: When the page loads, it gets a list of all companies via the RESTful API.
+   - **User Interaction**: After a user selects a company, the front-end requests detailed historical data for that company to draw the initial chart. Users can also enter buy/sell quantities to perform trades via the API with the back-end.
+   - **Real-time Updates**: The front-end uses a `WebSocket` client to listen for data pushes from the server. Once new data is received, it immediately updates the price display, charts, and the real-time profit and loss for the user's personal assets on the page.
+   - **US-China Mapping**: The front-end has a built-in mapping file (e.g., `mapping.json`) or gets it from the back-end, which is used to associate stock tickers (e.g., `AAPL`) with Chinese company names (e.g., `苹果公司`) for display.
+
+
+
+## ⚙️ How to Install and Run
+
+
+
+
+
+#### **Prerequisites**
+
+
+
+- `Node.js` (version 16.x or higher)
+- `npm` or `yarn`
+- `MySQL` client
+
+
+
+#### **Backend Setup**
+
+
+
+1. Clone the repository:
+
+   ```bash
+   git clone [Your repository URL]
+   ```
+
+2. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+3. Configure environment variables:
+
+   - Configure in the `config/mysql.js` file.
+   - Add necessary environment variables to the file, such as the database connection string and the Alpha Vantage API key.
+
+   ```js
+   # MySQL connection info
+   import mysql from 'mysql2/promise';
+   const connection = mysql.createPool({
+       host: 'IP',
+       user: 'username',
+       password: 'passwd',
+       database: 'table_six',
+   });
+   export default connection;
+   ```
+
+4. Start the back-end service:
+
+   ```bash
+   npm start
+   ```
+
+
+
+#### **Frontend Setup**
+
+
+
+1. Go to the front-end directory:
+
+   ```bash
+   cd ../web
+   ```
+
+2. Open `http://localhost:5500/web/login.html` (or your configured port) in your browser to log in and access.
